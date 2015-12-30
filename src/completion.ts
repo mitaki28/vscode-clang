@@ -26,7 +26,6 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             });
             proc.on('error', () => resolve("")); 
             token.onCancellationRequested(() => {
-                console.log('interupted');
                 proc.kill();  
                 resolve("");
             });
