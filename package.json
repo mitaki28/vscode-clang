@@ -19,7 +19,26 @@
 		"commands": [{
 			"command": "extension.sayHello",
 			"title": "Hello World"
-		}]
+		}],
+        "configuration": {
+            "type" : "object", 
+            "title": "clang configulation",
+            "properties": {
+                "clang.command": {
+                    "type": "string",
+                    "default": "clang",
+                    "description": "Command for executing clang"
+                },
+                "clang.cxxflags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "default": [],
+                    "description": "Flags for C++ (e.g. ['-std=c++11'])"                                
+                }
+            } 
+        }
 	},
 	"scripts": {
 		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",

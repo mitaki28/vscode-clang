@@ -5,6 +5,7 @@
 
 // The module 'assert' provides assertion methods from node
 import * as assert from 'assert';
+assert.equal = assert.strictEqual;
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
@@ -21,7 +22,7 @@ COMPLETION: back : [#reference#]back()
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Completion Tests", () => {
 	test("Completion RegExp", () => {
-        let matched = completion.REGEXP_COMPILATION.exec(COMPLETION_EXAMPLE);
+        let matched = completion.COMPILATION_REGEXP.exec(COMPLETION_EXAMPLE);
         assert.equal(matched[1], 'at');
         assert.equal(matched[2], '[#reference#]at(<#size_type __n#>)');
 	});
