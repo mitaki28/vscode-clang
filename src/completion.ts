@@ -8,7 +8,7 @@ export const COMPILATION_REGEXP = /^COMPLETION: (.*?) : (.*?)$/;
 
 const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
 
-function is_delimiter(c: string) {
+function isDelimiter(c: string) {
     return DELIMITERS.indexOf(c) != -1;
 }
 
@@ -17,7 +17,7 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
     let char = position.character;
     while (char < 1000 // ignore too long line for performance
             && char > 0
-            && !is_delimiter(document.getText(new vscode.Range(line, char - 1, line, char)))) char--;
+            && !isDelimiter(document.getText(new vscode.Range(line, char - 1, line, char)))) char--;
     return new vscode.Position(line, char); 
 }
 
