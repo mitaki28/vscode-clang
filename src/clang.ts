@@ -12,27 +12,19 @@ export function command(...options: string[]): string {
     return buf.join(' ');
 }
 
-export function exec(...options: string[]): process.ChildProcess {
-    return process.exec(command(...options));
-}
-
-export function complete(text: string, line: number, char: number) {
-    let proc = exec(
+export function complete(line: number, char: number): string {
+    return command(
         '-fsyntax-only',
         '-Xclang',
         `-code-completion-at='<stdin>:${line}:${char}'`,
         '-');
-    proc.stdin.end(text);
-    return proc;
 }
 
-export function check(text: string): process.ChildProcess {
-    let proc = exec(
+export function check(): string {
+    return command(
         '-fsyntax-only',
         '-fno-caret-diagnostics',
         '-fdiagnostics-print-source-range-info',
         '-fno-color-diagnostics',
         '-');
-    proc.stdin.end(text);
-    return proc;
 }

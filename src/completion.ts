@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import * as path from 'path';
+import * as child_process from 'child_process';
 
 import * as clang from './clang';
 
@@ -22,25 +24,25 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
 
 export class ClangCompletionItemProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
-        // Currently, Clang does NOT complete token partially (e.g. std::vec is not completed at all)
-        // So we find a previous delimiter and start complete from there.
-        let delPos = findPreviousDelimiter(document, position);
-        return this.fetchCompletionItems(document.getText(), delPos.line + 1, delPos.character + 1, token)
+        return this.fetchCompletionItems(document, position, token)
         .then((data) => {
             return this.parseCompletionItems(data);
         });
     }
     
-    fetchCompletionItems(text: string, line: number, char: number, token: vscode.CancellationToken): Thenable<string> {
+    fetchCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
-            let proc = clang.complete(text, line, char);
-            let buf: string[] = [];
-            proc.stdout.on('data', (data) => {
-                buf.push(data);
-            });
-            proc.stdout.on('close', () => {
-                resolve(buf.join(''));
-            });
+            // Currently, Clang does NOT complete token partially (e.g. std::vec is not completed at all)
+            // So we find a previous delimiter and start complete from there.
+            let delPos = findPreviousDelimiter(document, position);
+            let proc = child_process.exec(
+                clang.complete(delPos.line + 1, delPos.character + 1),
+                {cwd: path.dirname(document.uri.fsPath)},
+                (error, stdout, stderr) => {
+                    resolve(stdout);
+                }
+            );
+            proc.stdin.end(document.getText());
             token.onCancellationRequested(() => {
                 proc.kill();
                 resolve('');
@@ -51,7 +53,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
     parseCompletionItems(data: string): vscode.CompletionItem[] {
         let result: vscode.CompletionItem[] = []; 
         data.split('\n').forEach((line) => {
-            let matched = COMPILATION_REGEXP.exec(line);
+            let matched = line.match(COMPILATION_REGEXP);
             if (!matched) return;
             let item = new vscode.CompletionItem(matched[1]);
             item.detail = matched[2];

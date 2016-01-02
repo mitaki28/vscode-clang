@@ -18,7 +18,8 @@ const fixtures = [
     `<stdin>:23:45:{1:12-23:45}{56:67-78:89}: error: no member named 'vect' in namespace 'std'`,
     `<stdin>:6:13: error: expected ';' at end of declaration`,
     `hoge.cpp:6:13: error: expected ';' at end of declaration`,
-    `<stdin>:6:13: warning: expected ';' at end of declaration`
+    `<stdin>:6:13: warning: expected ';' at end of declaration`,
+    `<stdin>:5:10: fatal error: 'lib.hpp' file not found`
 ];
 
 // Defines a Mocha test suite to group tests of similar kind together
@@ -53,6 +54,12 @@ suite("Diagnostic Tests", () => {
         assert.equal(result[3].range.end.line, 6 - 1);
         assert.equal(result[3].range.end.character, 13 - 1);
         assert.equal(result[3].message, `expected ';' at end of declaration`); 
- 
+
+        assert.equal(result[4].severity, vscode.DiagnosticSeverity.Error);
+        assert.equal(result[4].range.start.line, 5 - 1);
+        assert.equal(result[4].range.start.character, 10 - 1);
+        assert.equal(result[4].range.end.line, 5 - 1);
+        assert.equal(result[4].range.end.character, 10 - 1);
+        assert.equal(result[4].message, `'lib.hpp' file not found`); 
     });
 });

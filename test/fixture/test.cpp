@@ -2,6 +2,8 @@
 #include<vector>
 #include<map>
 
+#include "lib.hpp"
+
 int main() {
     std::vector<int> a;
     int hoge;
@@ -14,5 +16,6 @@ int main() {
     for (std::map<int, int>::const_iterator it = mp.begin(); it != mp.end(); ++it) {
         std::cout << it->first << ' ' << it->second << std::endl;
     }
+    std::cout << test::sayHello() << std::endl;
     std::printf("Hello, %s\n", "world");
 }

@@ -1,11 +1,13 @@
 import * as vscode from 'vscode';
-import * as process from 'child_process';
+import * as child_process from 'child_process';
+import * as path from 'path';
 
 import * as clang from './clang';
 
-export const CHECK_REGEXP = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? (error|warning): (.*?)$/;  
+export const CHECK_REGEXP = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch(str) {
+        case 'fatal error': return vscode.DiagnosticSeverity.Error;
         case 'error': return vscode.DiagnosticSeverity.Error;
         case 'warning': return vscode.DiagnosticSeverity.Warning;
         default: return vscode.DiagnosticSeverity.Information;
@@ -88,22 +90,22 @@ function parseRanges(s: string): vscode.Range[] {
 
 export class ClangDiagnosticProvider implements DiagnosticProvider {
     provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]> {
-        return this.fetchDiagnostic(document.getText(), token)
+        return this.fetchDiagnostic(document, token)
         .then((data) => {
             return this.parseDiagnostic(data);
         });
     }
 
-    fetchDiagnostic(text: string, token: vscode.CancellationToken): Thenable<string> {
+    fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
-            let proc = clang.check(text);
-            let buf: string[] = [];
-            proc.stderr.on('data', (data) => {
-                buf.push(data);
-            });
-            proc.stderr.on('end', () => {
-                resolve(buf.join(''));
-            });
+            let proc = child_process.exec(
+                clang.check(),
+                {cwd: path.dirname(document.uri.fsPath)},
+                (error, stdout, stderr) => {
+                    resolve(stderr);
+                }
+            );
+            proc.stdin.end(document.getText());
             token.onCancellationRequested(() => {
                 proc.kill();
             });
@@ -113,7 +115,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
     parseDiagnostic(data: string): vscode.Diagnostic[] {
         let result: vscode.Diagnostic[] = []
         data.split('\n').forEach((line) => {
-            let matched = CHECK_REGEXP.exec(line);
+            let matched = line.match(CHECK_REGEXP);
             if (!matched) return;
             let range: vscode.Range;
             if (matched[3] == null) {
