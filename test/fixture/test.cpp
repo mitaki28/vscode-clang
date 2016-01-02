@@ -11,7 +11,7 @@ int main() {
         a[i] = 0;
     }
     std::map<int, int> mp;
-    for (std::map<int, int>::const_iterator it = mp.begin(); it != a.end(); ++it) {
+    for (std::map<int, int>::const_iterator it = mp.begin(); it != mp.end(); ++it) {
         std::cout << it->first << ' ' << it->second << std::endl;
     }
     std::printf("Hello, %s\n", "world");

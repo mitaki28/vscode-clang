@@ -3,7 +3,7 @@ import * as process from 'child_process';
 
 import * as clang from './clang';
 
-export const CHECK_REGEXP = /^\<stdin\>:(\d+):(\d+):(\{(\d+):(\d+)-(\d+):(\d+)\}:)? (error|warning): (.*?)$/;  
+export const CHECK_REGEXP = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? (error|warning): (.*?)$/;  
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch(str) {
         case 'error': return vscode.DiagnosticSeverity.Error;
@@ -60,6 +60,31 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
     };
 }
 
+function parseRanges(s: string): vscode.Range[] {
+    let p = 0;
+    let parseDigit = () => {
+        let ans = 0;
+        while (s[p].match(/[0-9]/)) {
+            ans = 10 * ans + parseInt(s[p++], 10);
+        }
+        return ans;
+    }
+    let result: vscode.Range[] = [];
+    while (s[p] == '{') {
+        s[p++]; // s[p] == '{'
+        let ans = 0;
+        let sline = parseDigit();
+        s[p++]; // s[p] == ':'
+        let schar = parseDigit();
+        s[p++]; // s[p] == '-'
+        let eline = parseDigit();
+        s[p++]; // s[p] == ':'
+        let echar = parseDigit();
+        s[p++]; // s[p] == '}'
+        result.push(new vscode.Range(sline, schar, eline, echar));
+    }
+    return result;
+}
 
 export class ClangDiagnosticProvider implements DiagnosticProvider {
     provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]> {
@@ -83,7 +108,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
                 proc.kill();
             });
         });    
-    } 
+    }
 
     parseDiagnostic(data: string): vscode.Diagnostic[] {
         let result: vscode.Diagnostic[] = []
@@ -91,19 +116,21 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
             let matched = CHECK_REGEXP.exec(line);
             if (!matched) return;
             let range: vscode.Range;
-            if (matched[4] == null) {
+            if (matched[3] == null) {
                 let line = parseInt(matched[1], 10);
                 let char = parseInt(matched[2], 10);
                 range = new vscode.Range(line - 1, char - 1, line - 1, char - 1);
             } else {
-                let sline = parseInt(matched[4], 10);
-                let schar = parseInt(matched[5], 10);
-                let eline = parseInt(matched[6], 10);
-                let echar = parseInt(matched[7], 10);
-                range = new vscode.Range(sline - 1, schar - 1, eline - 1, echar - 1);                
+                let ranges = parseRanges(matched[3]);
+                range = new vscode.Range(
+                    ranges[0].start.line - 1,
+                    ranges[0].start.character - 1,                    
+                    ranges[ranges.length - 1].end.line - 1,
+                    ranges[ranges.length - 1].end.character - 1                    
+                );
             }
-            let msg: string = matched[9];
-            let type: vscode.DiagnosticSeverity = str2diagserv(matched[8]);
+            let msg: string = matched[5];
+            let type: vscode.DiagnosticSeverity = str2diagserv(matched[4]);
 
             result.push(new vscode.Diagnostic(range, msg, type));
         });
