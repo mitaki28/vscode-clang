@@ -4,9 +4,28 @@ import * as clang from './clang';
 
 export const COMPILATION_REGEXP = /^COMPLETION: (.*?) : (.*?)$/;
 
+const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
+
+function is_delimiter(c: string) {
+    return DELIMITERS.indexOf(c) != -1;
+}
+
+function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
+    let line = position.line;
+    let char = position.character;
+    while (char < 1000 // ignore too long line for performance
+            && char > 0
+            && !is_delimiter(document.getText(new vscode.Range(line, char - 1, line, char)))) char--;
+    return new vscode.Position(line, char); 
+}
+
+
 export class ClangCompletionItemProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
-        return this.fetchCompletionItems(document.getText(), position.line + 1, position.character + 1, token)
+        // Currently, Clang does NOT complete token partially (e.g. std::vec is not completed at all)
+        // So we find a previous delimiter and start complete from there.
+        let delPos = findPreviousDelimiter(document, position);
+        return this.fetchCompletionItems(document.getText(), delPos.line + 1, delPos.character + 1, token)
         .then((data) => {
             return this.parseCompletionItems(data);
         });
@@ -19,12 +38,9 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             proc.stdout.on('data', (data) => {
                 buf.push(data);
             });
-            proc.stdout.on('end', () => {
+            proc.stdout.on('close', () => {
                 resolve(buf.join(''));
             });
-            proc.on('error', () => {
-                resolve('');
-            }); 
             token.onCancellationRequested(() => {
                 proc.kill();
                 resolve('');

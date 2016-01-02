@@ -22,9 +22,7 @@ export function complete(text: string, line: number, char: number) {
         '-Xclang',
         `-code-completion-at='<stdin>:${line}:${char}'`,
         '-');
-    proc.stdin.write(text, () => {
-        proc.stdin.end();
-    });
+    proc.stdin.end(text);
     return proc;
 }
 
@@ -35,8 +33,6 @@ export function check(text: string): process.ChildProcess {
         '-fdiagnostics-print-source-range-info',
         '-fno-color-diagnostics',
         '-');
-    proc.stdin.write(text, () => {
-        proc.stdin.end();
-    });
+    proc.stdin.end(text);
     return proc;
 }

@@ -18,7 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.languages.registerCompletionItemProvider(
             CPP_MODE,
             new completion.ClangCompletionItemProvider(),
-            '.'
+            '.', ':', '>'
         ));
 
 
