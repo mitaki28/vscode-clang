@@ -1,51 +1,72 @@
 {
-	"name": "vscode-clang",
-	"displayName": "vscode-clang",
-	"description": "IDE for C/C++ using clang",
-	"version": "0.0.1",
-	"publisher": "mitaki28",
-	"engines": {
-		"vscode": "^0.10.1"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-        "onLanguage:cpp",
-		"onCommand:extension.sayHello"
-	],
-	"main": "./out/src/extension",
-	"contributes": {
-		"commands": [{
-			"command": "extension.sayHello",
-			"title": "Hello World"
-		}],
-        "configuration": {
-            "type" : "object", 
-            "title": "clang configulation",
-            "properties": {
-                "clang.command": {
-                    "type": "string",
-                    "default": "clang",
-                    "description": "Command for executing clang"
-                },
-                "clang.cxxflags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    },
-                    "default": [],
-                    "description": "Flags for C++ (e.g. ['-std=c++11'])"                                
-                }
-            } 
-        }
-	},
-	"scripts": {
-		"vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-		"compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
-	},
-	"devDependencies": {
-		"typescript": "^1.6.2",
-		"vscode": "0.10.x"
-	}
+  "name": "vscode-clang",
+  "displayName": "vscode-clang",
+  "description": "IDE for C/C++ using clang",
+  "version": "0.0.1",
+  "publisher": "mitaki28",
+  "engines": {
+    "vscode": "^0.10.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:cpp",
+    "onLanguage:c",
+    "onLanguage:objective-c",
+    "onCommand:extension.sayHello"
+  ],
+  "main": "./out/src/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.sayHello",
+        "title": "Hello World"
+      }
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "clang configulation",
+      "properties": {
+        "clang.command": {
+          "type": "string",
+          "default": "clang",
+          "description": "Command for executing clang"
+        },
+        "clang.cflags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Flags for C (e.g. ['-std=c99'])"
+        },
+        "clang.cxxflags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Flags for C++ (e.g. ['-std=c++11'])"
+        },
+        "clang.objcflags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Flags for Objective-C"
+        }        
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+  },
+  "devDependencies": {
+    "typescript": "^1.6.2",
+    "vsce": "^1.0.0",
+    "vscode": "0.10.x"
+  }
 }

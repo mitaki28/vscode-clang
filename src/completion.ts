@@ -4,7 +4,12 @@ import * as child_process from 'child_process';
 
 import * as clang from './clang';
 
-export const COMPILATION_REGEXP = /^COMPLETION: (.*?) : (.*?)$/;
+export const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
+export const descriptionRe = /^(.*?)(?: : (.*))?$/;
+export const returnTypeRe = /\[#([^#]+)#\]/ig;
+export const argumentTypeRe = /\<#([^#]+)#\>/ig;
+export const optionalArgumentLeftRe = /\{#(,? ?.+?)(?=#\}|\{#)/ig;
+export const optionalArgumentRightRe = /#\}/ig;
 
 const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
 
@@ -15,9 +20,8 @@ function isDelimiter(c: string) {
 function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
     let line = position.line;
     let char = position.character;
-    while (char < 1000 // ignore too long line for performance
-            && char > 0
-            && !isDelimiter(document.getText(new vscode.Range(line, char - 1, line, char)))) char--;
+    const s = document.getText(new vscode.Range(line, 0, line, char));
+    while (char > 0 && !isDelimiter(s[char - 1])) char--;
     return new vscode.Position(line, char); 
 }
 
@@ -36,7 +40,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             // So we find a previous delimiter and start complete from there.
             let delPos = findPreviousDelimiter(document, position);
             let proc = child_process.exec(
-                clang.complete(delPos.line + 1, delPos.character + 1),
+                clang.complete(document.languageId, delPos.line + 1, delPos.character + 1),
                 {cwd: path.dirname(document.uri.fsPath)},
                 (error, stdout, stderr) => {
                     resolve(stdout);
@@ -50,14 +54,52 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         });        
     }
     
+    parseCompletionItem(line: string): vscode.CompletionItem|void {
+        let matched = line.match(completionRe);
+        if (matched == null) return;
+        let [_line, symbol, description] = matched;
+        let item = new vscode.CompletionItem(symbol);
+        if (description == null) {
+            item.detail = symbol;
+            item.kind = vscode.CompletionItemKind.Class;
+            return item;
+        }
+        let [_description, signature, comment] = description.match(descriptionRe);
+        if (comment != null) {
+            item.documentation = comment;
+        }
+        let hasValue = false;
+        signature = signature.replace(returnTypeRe, (match: string, arg: string): string => {
+            hasValue = true;
+            return arg + ' ';
+        });
+        signature = signature.replace(argumentTypeRe, (match: string, arg: string): string => {
+            return arg;
+        });
+        signature = signature.replace(optionalArgumentLeftRe, (match: string, arg: string): string => {
+            return arg + '=?';
+        });
+        signature = signature.replace(optionalArgumentRightRe, (match: string, arg: string): string => {
+            return '';
+        });
+        item.detail = signature;
+        if (signature.indexOf('(') != -1) {
+            item.kind = vscode.CompletionItemKind.Function;
+        } else if (hasValue) {
+            item.kind = vscode.CompletionItemKind.Variable;            
+        } else {
+            item.kind = vscode.CompletionItemKind.Class;
+        }
+        return item;
+    }
+    
     parseCompletionItems(data: string): vscode.CompletionItem[] {
         let result: vscode.CompletionItem[] = []; 
         data.split('\n').forEach((line) => {
-            let matched = line.match(COMPILATION_REGEXP);
-            if (!matched) return;
-            let item = new vscode.CompletionItem(matched[1]);
-            item.detail = matched[2];
-            result.push(item);
+            let item = this.parseCompletionItem(line);
+            if (item instanceof vscode.CompletionItem) {
+                result.push(item);            
+            }
         });
         return result;
     }

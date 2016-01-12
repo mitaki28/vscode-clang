@@ -4,7 +4,11 @@ import * as vscode from 'vscode';
 import * as diagnostic from './diagnostic'
 import * as completion from './completion'
 
-const CPP_MODE: vscode.DocumentSelector = { language: 'cpp', scheme: 'file' };
+const CLANG_MODE: vscode.DocumentSelector = [
+    { language: 'cpp', scheme: 'file' },
+    { language: 'c', scheme: 'file' },
+    { language: 'objective-c', scheme: 'file' }
+];
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -16,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(
         vscode.languages.registerCompletionItemProvider(
-            CPP_MODE,
+            CLANG_MODE,
             new completion.ClangCompletionItemProvider(),
             '.', ':', '>'
         ));
@@ -26,7 +30,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(diagnosticCollection);
     context.subscriptions.push(
         diagnostic.registerDiagnosticProvider(
-            CPP_MODE,
+            CLANG_MODE,
             new diagnostic.ClangDiagnosticProvider,
             diagnosticCollection
         ));

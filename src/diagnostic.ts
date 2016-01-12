@@ -51,7 +51,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
             cancellers.get(uriStr).dispose();
             cancellers.delete(uriStr);
             collection.set(uri, diagnostics);
-        });
+        }, (_) => { /* do nothing */});
     });
     return {
         dispose() {
@@ -99,7 +99,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
             let proc = child_process.exec(
-                clang.check(),
+                clang.check(document.languageId),
                 {cwd: path.dirname(document.uri.fsPath)},
                 (error, stdout, stderr) => {
                     resolve(stderr);
@@ -107,6 +107,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
             );
             proc.stdin.end(document.getText());
             token.onCancellationRequested(() => {
+                reject();
                 proc.kill();
             });
         });    

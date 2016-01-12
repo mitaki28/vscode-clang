@@ -16,27 +16,155 @@ const COMPLETION_EXAMPLE = `COMPLETION: at : [#reference#]at(<#size_type __n#>)`
 const COMPLETION_EXAMPLES = `COMPLETION: at : [#reference#]at(<#size_type __n#>)
 COMPLETION: at : [#const_reference#]at(<#size_type __n#>)[# const#]
 COMPLETION: back : [#reference#]back()
+COMPLETION: back : [#reference#]back()
+COMPLETION: hoge : [#int#]hoge() : f function
+COMPLETION: hoge : [#int#]hoge() : f function : g function
+COMPLETION: hoge : [#int#]hoge(<#int a#>{#, <#int b#>{#, <#int c#>#}#}) : f function
+COMPLETION: hoge : [#int#]hoge({#<#int a#>{#, <#int b#>{#, <#int c#>#}#}#}) : f function
+COMPLETION: Fuga : Fuga<<#typename T#>{#, <#typename I#>#}> : fuga struct
+COMPLETION: Fuga : Fuga<{#<#typename T#>{#, <#typename I#>#}#}> : fuga struct
+COMPLETION: wchar_t
+COMPLETION: hoge : [#int#]hoge : int variable
+b.cc:44:41: error: unknown type name 'A'
 `
 
 
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Completion Tests", () => {
-	test("Completion RegExp", () => {
-        let matched = completion.COMPILATION_REGEXP.exec(COMPLETION_EXAMPLE);
-        assert.equal(matched[1], 'at');
-        assert.equal(matched[2], '[#reference#]at(<#size_type __n#>)');
-	});
-    
-    test('Completion Parse', () => {
-        let provider = new completion.ClangCompletionItemProvider;
-        let parsed = provider.parseCompletionItems(COMPLETION_EXAMPLES);
-        assert.equal(parsed[0].label, 'at');
-        assert.equal(parsed[0].detail, '[#reference#]at(<#size_type __n#>)');
-        assert.equal(parsed[1].label, 'at');
-        assert.equal(parsed[1].detail, '[#const_reference#]at(<#size_type __n#>)[# const#]');
-        assert.equal(parsed[2].label, 'back');
-        assert.equal(parsed[2].detail, '[#reference#]back()');
+    let provider = new completion.ClangCompletionItemProvider;
+    test('method', () => {
+        let item = provider.parseCompletionItem('COMPLETION: at : [#reference#]at(<#size_type __n#>)');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'at');
+            assert.equal(item.detail, 'reference at(size_type __n)');
+            assert.equal(item.documentation, undefined);
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
     });
-    
-    
+    test('const method', () => {
+        let item = provider.parseCompletionItem('COMPLETION: at : [#const_reference#]at(<#size_type __n#>)[# const#]');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'at');
+            assert.equal(item.detail, 'const_reference at(size_type __n) const ');
+            assert.equal(item.documentation, undefined);
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('no argument method', () => {
+        let item = provider.parseCompletionItem('COMPLETION: back : [#reference#]back()');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'back');
+            assert.equal(item.detail, 'reference back()');
+            assert.equal(item.documentation, undefined);
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('function with comment', () => {
+        let item = provider.parseCompletionItem('COMPLETION: hoge : [#int#]hoge() : f function');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'hoge');
+            assert.equal(item.detail, 'int hoge()');
+            assert.equal(item.documentation, 'f function');
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('function with comment which includes ":"', () => {
+        let item = provider.parseCompletionItem('COMPLETION: hoge : [#int#]hoge() : f function : g function');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'hoge');
+            assert.equal(item.detail, 'int hoge()');
+            assert.equal(item.documentation, 'f function : g function');
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('function with optional argument', () => {
+        let item = provider.parseCompletionItem('COMPLETION: hoge : [#int#]hoge(<#int a#>{#, <#int b#>{#, <#int c#>#}#}) : f function');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'hoge');
+            assert.equal(item.detail, 'int hoge(int a, int b=?, int c=?)');
+            assert.equal(item.documentation, 'f function');
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('function with all optional argument', () => {
+        let item = provider.parseCompletionItem('COMPLETION: hoge : [#int#]hoge({#<#int a#>{#, <#int b#>{#, <#int c#>#}#}#}) : f function');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'hoge');
+            assert.equal(item.detail, 'int hoge(int a=?, int b=?, int c=?)');
+            assert.equal(item.documentation, 'f function');
+            assert.equal(item.kind, vscode.CompletionItemKind.Function);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('template class with optional argument', () => {
+        let item = provider.parseCompletionItem('COMPLETION: Fuga : Fuga<<#typename T#>{#, <#typename I#>#}> : fuga struct');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'Fuga');
+            assert.equal(item.detail, 'Fuga<typename T, typename I=?>');
+            assert.equal(item.documentation, 'fuga struct');
+            assert.equal(item.kind, vscode.CompletionItemKind.Class);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('template class with all optional argument', () => {
+        let item = provider.parseCompletionItem('COMPLETION: Fuga : Fuga<{#<#typename T#>{#, <#typename I#>#}#}> : fuga struct');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'Fuga');
+            assert.equal(item.detail, 'Fuga<typename T=?, typename I=?>');
+            assert.equal(item.documentation, 'fuga struct');
+            assert.equal(item.kind, vscode.CompletionItemKind.Class);
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('no detail', () => {
+        let item = provider.parseCompletionItem('COMPLETION: wchar_t');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'wchar_t');
+            assert.equal(item.detail, 'wchar_t');
+            assert.equal(item.documentation, undefined);
+            assert.equal(item.kind, vscode.CompletionItemKind.Class);            
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('variable', () => {
+        let item = provider.parseCompletionItem('COMPLETION: hoge : [#int#]hoge : int variable');
+        if (item instanceof vscode.CompletionItem) {
+            assert.equal(item.label, 'hoge');
+            assert.equal(item.detail, 'int hoge');
+            assert.equal(item.documentation, 'int variable');
+            assert.equal(item.kind, vscode.CompletionItemKind.Variable);            
+        } else {
+            assert.fail();
+        }
+    });
+
+    test('illegal line', () => {
+        let item = provider.parseCompletionItem('b.cc:44:41: error: unknown type name');
+        assert(typeof item === 'undefined');
+    });
 });
