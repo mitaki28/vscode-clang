@@ -28,12 +28,12 @@ function delay(token: vscode.CancellationToken): Thenable<void> {
         }, DELAY_TIME);
         token.onCancellationRequested(() => {
             clearTimeout(timer);
-            //reject();
+            reject();
         });
     });
 }
 
-export function registerDiagnosticProvider(selector: vscode.DocumentSelector, provider: DiagnosticProvider, collection: vscode.DiagnosticCollection) : vscode.Disposable {         
+export function registerDiagnosticProvider(selector: vscode.DocumentSelector, provider: DiagnosticProvider, collection: vscode.DiagnosticCollection) : vscode.Disposable {
     let cancellers = new Map<string, vscode.CancellationTokenSource>();
     vscode.workspace.onDidChangeTextDocument((change) => {
         if (!vscode.languages.match(selector, change.document)) return;

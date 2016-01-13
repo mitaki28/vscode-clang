@@ -31,7 +31,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         return this.fetchCompletionItems(document, position, token)
         .then((data) => {
             return this.parseCompletionItems(data);
-        });
+        }, (_) => { /* do nothing */ });
     }
     
     fetchCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<string> {
@@ -49,7 +49,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             proc.stdin.end(document.getText());
             token.onCancellationRequested(() => {
                 proc.kill();
-                resolve('');
+                reject();
             });
         });        
     }
