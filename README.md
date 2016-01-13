@@ -1,13 +1,13 @@
-# README
-## This is the README for your extension "vscode-clang" 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+# vscode-clang
 
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
+Completion and Diagnostic for C/C++/Objective-C using Clang
 
-### For more information
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## Configulation
 
-** Enjoy!**
+- `clang.executable`: Clang command or the path to the Clang executable (default: `clang`)
+- `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Compiler Options for C/C++/Objective-C
+
+
+## Acknowladgement
+
+- Regexp for parsing completion result of Clang is based [autocomplete-clang](https://github.com/yasuyuky/autocomplete-clang).

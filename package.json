@@ -1,7 +1,7 @@
 {
   "name": "vscode-clang",
   "displayName": "vscode-clang",
-  "description": "completion and diagnostic for C/C++/Objective-C using Clang",
+  "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
   "version": "0.0.2",
   "publisher": "mitaki28",
   "engines": {
@@ -26,7 +26,7 @@
         "clang.executable": {
           "type": "string",
           "default": "clang",
-          "description": "The path to the Clang executable"
+          "description": "Clang command or The path to the Clang executable"
         },
         "clang.cflags": {
           "type": "array",
@@ -34,7 +34,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Flags for C (e.g. ['-std=c99'])"
+          "description": "Compiler options for C (e.g. ['-std=c99'])"
         },
         "clang.cxxflags": {
           "type": "array",
@@ -42,7 +42,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Flags for C++ (e.g. ['-std=c++11'])"
+          "description": "Compiler options for C++ (e.g. ['-std=c++11'])"
         },
         "clang.objcflags": {
           "type": "array",
@@ -50,7 +50,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Flags for Objective-C"
+          "description": "Compiler options for Objective-C"
         }        
       }
     }
