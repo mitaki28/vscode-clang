@@ -39,10 +39,11 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             // Currently, Clang does NOT complete token partially 
             // So we find a previous delimiter and start complete from there.
             let delPos = findPreviousDelimiter(document, position);
-            let proc = child_process.exec(
-                clang.complete(document.languageId, delPos.line + 1, delPos.character + 1),
+            let [cmd, args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
+            let proc = child_process.execFile(cmd, args, 
                 {cwd: path.dirname(document.uri.fsPath)},
                 (error, stdout, stderr) => {
+                    console.log(error, stdout, stderr);
                     resolve(stdout);
                 }
             );

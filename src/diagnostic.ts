@@ -98,8 +98,8 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
 
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
-            let proc = child_process.exec(
-                clang.check(document.languageId),
+            let [cmd, args] = clang.check(document.languageId);
+            let proc = child_process.execFile(cmd, args, 
                 {cwd: path.dirname(document.uri.fsPath)},
                 (error, stdout, stderr) => {
                     resolve(stderr);
