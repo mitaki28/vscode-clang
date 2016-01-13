@@ -23,7 +23,7 @@
       "type": "object",
       "title": "Clang configulation",
       "properties": {
-        "clang.command": {
+        "clang.executable": {
           "type": "string",
           "default": "clang",
           "description": "The path to the Clang executable"
