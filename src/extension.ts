@@ -17,7 +17,7 @@ export function activate(context: vscode.ExtensionContext) {
         ));
 
 
-    let diagnosticCollection = vscode.languages.createDiagnosticCollection('cpp');
+    let diagnosticCollection = vscode.languages.createDiagnosticCollection('clang');
     context.subscriptions.push(diagnosticCollection);
     context.subscriptions.push(
         diagnostic.registerDiagnosticProvider(
