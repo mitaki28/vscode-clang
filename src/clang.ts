@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import * as process from 'child_process';
+import * as child_process from 'child_process';
 
 export function command(language: string, ...options: string[]): string {
     let clangConf = vscode.workspace.getConfiguration('clang');
