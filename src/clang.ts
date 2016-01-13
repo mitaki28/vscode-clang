@@ -5,7 +5,6 @@ export function command(language: string, ...options: string[]): string {
     let clangConf = vscode.workspace.getConfiguration('clang');
     let buf: string[] = [];
     buf.push(clangConf.get<string>('executable'));
-    // TODO configulation for C
     if (language === 'cpp') {
         buf.push(...clangConf.get<string[]>('cxxflags'));
         buf.push('-x', 'c++');

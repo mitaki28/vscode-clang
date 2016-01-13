@@ -36,7 +36,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
     
     fetchCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
-            // Currently, Clang does NOT complete token partially (e.g. std::vec is not completed at all)
+            // Currently, Clang does NOT complete token partially 
             // So we find a previous delimiter and start complete from there.
             let delPos = findPreviousDelimiter(document, position);
             let proc = child_process.exec(

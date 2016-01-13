@@ -51,7 +51,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
             cancellers.get(uriStr).dispose();
             cancellers.delete(uriStr);
             collection.set(uri, diagnostics);
-        }, (_) => { /* do nothing */});
+        }, (_) => { /* do nothing */ });
     });
     return {
         dispose() {
