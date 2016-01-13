@@ -2,7 +2,7 @@
   "name": "vscode-clang",
   "displayName": "vscode-clang",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "publisher": "mitaki28",
   "repository": {
       "type": "git",
