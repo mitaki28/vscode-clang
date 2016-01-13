@@ -3,7 +3,11 @@
   "displayName": "vscode-clang",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
   "version": "0.0.2",
-  "publisher": "mitaki28",
+  "publisher": "Yasuaki MITANI",
+  "repository": {
+      "type": "git",
+      "url": "https://github.com/mitaki28/vscode-clang"
+  },
   "engines": {
     "vscode": "^0.10.1"
   },
