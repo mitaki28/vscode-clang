@@ -43,7 +43,6 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             let proc = child_process.execFile(cmd, args, 
                 {cwd: path.dirname(document.uri.fsPath)},
                 (error, stdout, stderr) => {
-                    console.log(error, stdout, stderr);
                     resolve(stdout);
                 }
             );
