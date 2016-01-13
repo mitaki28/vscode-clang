@@ -12,23 +12,6 @@ assert.equal = assert.strictEqual;
 import * as vscode from 'vscode';
 import * as completion from '../src/completion';
 
-const COMPLETION_EXAMPLE = `COMPLETION: at : [#reference#]at(<#size_type __n#>)`
-const COMPLETION_EXAMPLES = `COMPLETION: at : [#reference#]at(<#size_type __n#>)
-COMPLETION: at : [#const_reference#]at(<#size_type __n#>)[# const#]
-COMPLETION: back : [#reference#]back()
-COMPLETION: back : [#reference#]back()
-COMPLETION: hoge : [#int#]hoge() : f function
-COMPLETION: hoge : [#int#]hoge() : f function : g function
-COMPLETION: hoge : [#int#]hoge(<#int a#>{#, <#int b#>{#, <#int c#>#}#}) : f function
-COMPLETION: hoge : [#int#]hoge({#<#int a#>{#, <#int b#>{#, <#int c#>#}#}#}) : f function
-COMPLETION: Fuga : Fuga<<#typename T#>{#, <#typename I#>#}> : fuga struct
-COMPLETION: Fuga : Fuga<{#<#typename T#>{#, <#typename I#>#}#}> : fuga struct
-COMPLETION: wchar_t
-COMPLETION: hoge : [#int#]hoge : int variable
-b.cc:44:41: error: unknown type name 'A'
-`
-
-
 // Defines a Mocha test suite to group tests of similar kind together
 suite("Completion Tests", () => {
     let provider = new completion.ClangCompletionItemProvider;
