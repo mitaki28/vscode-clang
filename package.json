@@ -1,37 +1,32 @@
 {
   "name": "vscode-clang",
   "displayName": "vscode-clang",
-  "description": "IDE for C/C++ using clang",
-  "version": "0.0.1",
+  "description": "completion and diagnostic for C/C++/Objective-C using Clang",
+  "version": "0.0.2",
   "publisher": "mitaki28",
   "engines": {
     "vscode": "^0.10.1"
   },
   "categories": [
+    "Languages",
+    "Linters",
     "Other"
   ],
   "activationEvents": [
     "onLanguage:cpp",
     "onLanguage:c",
-    "onLanguage:objective-c",
-    "onCommand:extension.sayHello"
+    "onLanguage:objective-c"
   ],
   "main": "./out/src/extension",
   "contributes": {
-    "commands": [
-      {
-        "command": "extension.sayHello",
-        "title": "Hello World"
-      }
-    ],
     "configuration": {
       "type": "object",
-      "title": "clang configulation",
+      "title": "Clang configulation",
       "properties": {
         "clang.command": {
           "type": "string",
           "default": "clang",
-          "description": "Command for executing clang"
+          "description": "The path to the Clang executable"
         },
         "clang.cflags": {
           "type": "array",
