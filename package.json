@@ -1,9 +1,10 @@
 {
   "name": "vscode-clang",
-  "displayName": "vscode-clang",
+  "displayName": "C/C++ Clang",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "publisher": "mitaki28",
+  "license": "MIT",
   "repository": {
       "type": "git",
       "url": "https://github.com/mitaki28/vscode-clang"
