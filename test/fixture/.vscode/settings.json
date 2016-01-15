@@ -2,5 +2,4 @@
 {
     "clang.executable": "clang",
     "clang.cxxflags": ["--std=c++11"]
-    
 }

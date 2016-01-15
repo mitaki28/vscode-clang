@@ -15,7 +15,7 @@ You can use configuration interface of Visual Studio Code. (Press `F1` and type 
 
 - `clang.executable`: Clang command or the path to the Clang executable (default: `clang`)
 - `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Compiler Options for C/C++/Objective-C
-
+- `clang.diagnosticDelay`: The delay after which diagnostic starts in millisecond (default: 500)
 
 ## Acknowledgements
 

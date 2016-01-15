@@ -35,7 +35,7 @@
         "clang.executable": {
           "type": "string",
           "default": "clang",
-          "description": "Clang command or The path to the Clang executable"
+          "description": "Clang command or the path to the Clang executable"
         },
         "clang.cflags": {
           "type": "array",
@@ -60,7 +60,12 @@
           },
           "default": [],
           "description": "Compiler options for Objective-C"
-        }        
+        },
+        "clang.diagnosticDelay": {
+           "type": "number",
+           "default": 500,
+           "description": "The delay after which diagnostic starts (in millisecond)"
+        }             
       }
     }
   },

@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import * as clang from './clang';
 
-export const CHECK_REGEXP = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
+export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch(str) {
         case 'fatal error': return vscode.DiagnosticSeverity.Error;
@@ -18,14 +18,11 @@ export interface DiagnosticProvider {
     provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]>
 }
 
-const DELAY_TIME = 500;
-
-    
 function delay(token: vscode.CancellationToken): Thenable<void> {
     return new Promise<void>((resolve, reject) => {
         let timer = setTimeout(() => {
             resolve();
-        }, DELAY_TIME);
+        }, vscode.workspace.getConfiguration('clang').get<number>('diagnosticDelay'));
         token.onCancellationRequested(() => {
             clearTimeout(timer);
             reject();
@@ -35,6 +32,7 @@ function delay(token: vscode.CancellationToken): Thenable<void> {
 
 export function registerDiagnosticProvider(selector: vscode.DocumentSelector, provider: DiagnosticProvider, collection: vscode.DiagnosticCollection) : vscode.Disposable {
     let cancellers = new Map<string, vscode.CancellationTokenSource>();
+    let subsctiptions: vscode.Disposable[] = [];
     vscode.workspace.onDidChangeTextDocument((change) => {
         if (!vscode.languages.match(selector, change.document)) return;
         const uri = change.document.uri;
@@ -52,12 +50,13 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
             cancellers.delete(uriStr);
             collection.set(uri, diagnostics);
         }, (_) => { /* do nothing */ });
-    });
+    }, null, subsctiptions);
     return {
         dispose() {
             for (let canceller of Array.from(cancellers.values())) {
                 canceller.dispose();
-            }        
+            }
+            vscode.Disposable.from(...subsctiptions).dispose();  
         }
     };
 }
@@ -116,7 +115,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
     parseDiagnostic(data: string): vscode.Diagnostic[] {
         let result: vscode.Diagnostic[] = []
         data.split('\n').forEach((line) => {
-            let matched = line.match(CHECK_REGEXP);
+            let matched = line.match(diagnosticRe);
             if (!matched) return;
             let range: vscode.Range;
             if (matched[3] == null) {
