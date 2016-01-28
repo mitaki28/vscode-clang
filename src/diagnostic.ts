@@ -4,7 +4,7 @@ import * as path from 'path';
 
 import * as clang from './clang';
 
-export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
+export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)\r?$/;
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch(str) {
         case 'fatal error': return vscode.DiagnosticSeverity.Error;
