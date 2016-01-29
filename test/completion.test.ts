@@ -150,4 +150,43 @@ suite("Completion Tests", () => {
         let item = provider.parseCompletionItem('b.cc:44:41: error: unknown type name');
         assert(typeof item === 'undefined');
     });
+
+    test('lineEnds', () => {
+        let lines = [
+            `COMPLETION: at : [#reference#]at(<#size_type __n#>)`,
+            `COMPLETION: at : [#const_reference#]at(<#size_type __n#>)[# const#]`,
+            `COMPLETION: back : [#reference#]back()`
+        ];
+        for (let lineEnd of ['\r\n', '\r', '\n']) {
+            let items = provider.parseCompletionItems(lines.join(lineEnd));
+            assert.equal(items.length, 3);
+            var item = items[0];
+            if (item instanceof vscode.CompletionItem) {
+                assert.equal(item.label, 'at');
+                assert.equal(item.detail, 'reference at(size_type __n)');
+                assert.equal(item.documentation, undefined);
+                assert.equal(item.kind, vscode.CompletionItemKind.Function);
+            } else {
+                assert.fail();
+            }
+            var item = items[1];
+            if (item instanceof vscode.CompletionItem) {
+                assert.equal(item.label, 'at');
+                assert.equal(item.detail, 'const_reference at(size_type __n) const ');
+                assert.equal(item.documentation, undefined);
+                assert.equal(item.kind, vscode.CompletionItemKind.Function);
+            } else {
+                assert.fail();
+            }
+            var item = items[2];
+            if (item instanceof vscode.CompletionItem) {
+                assert.equal(item.label, 'back');
+                assert.equal(item.detail, 'reference back()');
+                assert.equal(item.documentation, undefined);
+                assert.equal(item.kind, vscode.CompletionItemKind.Function);
+            } else {
+                assert.fail();
+            }               
+        }      
+    });
 });

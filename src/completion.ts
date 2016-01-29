@@ -95,7 +95,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
     
     parseCompletionItems(data: string): vscode.CompletionItem[] {
         let result: vscode.CompletionItem[] = []; 
-        data.split('\n').forEach((line) => {
+        data.split(/\r\n|\r|\n/).forEach((line) => {
             let item = this.parseCompletionItem(line);
             if (item instanceof vscode.CompletionItem) {
                 result.push(item);            
