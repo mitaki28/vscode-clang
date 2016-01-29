@@ -114,7 +114,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
 
     parseDiagnostic(data: string): vscode.Diagnostic[] {
         let result: vscode.Diagnostic[] = []
-        data.split('\n').forEach((line) => {
+        data.split(/\r\n|\r|\n/).forEach((line) => {
             let matched = line.match(diagnosticRe);
             if (!matched) return;
             let range: vscode.Range;
