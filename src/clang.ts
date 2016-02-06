@@ -1,18 +1,22 @@
-import * as vscode from 'vscode';
+import * as path from "path"
 import * as child_process from 'child_process';
+
+import * as vscode from 'vscode';
+
+import * as variable from "./variable"
 
 export function command(language: string, ...options: string[]): [string, string[]] {
     let clangConf = vscode.workspace.getConfiguration('clang');
-    let cmd = clangConf.get<string>('executable');
+    let cmd = variable.resolve(clangConf.get<string>('executable'));
     let args: string[] = [];    
     if (language === 'cpp') {
-        args.push(...clangConf.get<string[]>('cxxflags'));
+        args.push(...clangConf.get<string[]>('cxxflags').map(variable.resolve));
         args.push('-x', 'c++');
     } else if (language === 'c') {
-        args.push(...clangConf.get<string[]>('cflags'));
+        args.push(...clangConf.get<string[]>('cflags').map(variable.resolve));
         args.push('-x', 'c');
     } else if (language === 'objective-c') {
-        args.push(...clangConf.get<string[]>('objcflags'));
+        args.push(...clangConf.get<string[]>('objcflags').map(variable.resolve));
         args.push('-x', 'objective-c');
     }
     args.push(...options);
