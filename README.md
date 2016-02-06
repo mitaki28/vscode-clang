@@ -17,6 +17,19 @@ You can use configuration interface of Visual Studio Code. (Press `F1` and type 
 - `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Compiler Options for C/C++/Objective-C
 - `clang.diagnosticDelay`: The delay in millisecond after which diagnostic starts (default: 500)
 
+### Variables
+
+Configurations support some variables which are available in `tasks.json`.
+They can be used inside of strings (e.g. `"-I${workspaceRoot}/include"`)
+
+- `${workspaceRoot}`
+- `${cwd}`
+- `${env.ENVIRONMENT_VARIABLE}`
+
+## Command
+
+- `Show Executable and Compile Options`: Showing Clang executable and compile options for the active editor.
+
 ## Acknowledgements
 
 - Regexp for parsing completion results of Clang is based [autocomplete-clang](https://github.com/yasuyuky/autocomplete-clang).
