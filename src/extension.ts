@@ -12,9 +12,23 @@ const CLANG_MODE: vscode.DocumentSelector = [
 
 export function activate(context: vscode.ExtensionContext) {
     
+    let confViewer = new configuration.ConfigurationViewer;
+    context.subscriptions.push(confViewer);
+    context.subscriptions.push(vscode.commands.registerCommand('clang.showExecConf', () => {
+        let editor = vscode.window.activeTextEditor;
+        if (editor == null) {
+            vscode.window.showErrorMessage(`No active editor.`);
+            return;
+        }
+        if (!vscode.languages.match(CLANG_MODE, editor.document)) {
+            vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C`);
+            return;            
+        }
+        confViewer.show(editor.document);
+    }));    
+    
     let confTester = new configuration.ConfigurationTester;
     context.subscriptions.push(confTester);
-    
     let subscriptions: vscode.Disposable[] = [];
     vscode.window.onDidChangeActiveTextEditor((editor) => {
         if (!vscode.languages.match(CLANG_MODE, editor.document)) return;
