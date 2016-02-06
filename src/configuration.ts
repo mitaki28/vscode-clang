@@ -10,7 +10,7 @@ export class ConfigurationTester implements vscode.Disposable{
         this.processes = new Map<number, child_process.ChildProcess>();
     }
     test(language: string): void {
-        let [cmd, args] = clang.command(language, '--version');
+        let [cmd, args] = clang.version(language);
         let proc = child_process.execFile(cmd, args, (error, stdout, stderr) => {
             if (error) {
                 if ((<any>error).code == 'ENOENT') {

@@ -41,3 +41,7 @@ export function check(language: string): [string, string[]] {
         '-fno-color-diagnostics',
         '-');
 }
+
+export function version(language: string): [string, string[]] {
+    return command(language, "--version");
+}
