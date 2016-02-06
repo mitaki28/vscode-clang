@@ -24,10 +24,16 @@
   "activationEvents": [
     "onLanguage:cpp",
     "onLanguage:c",
-    "onLanguage:objective-c"
+    "onLanguage:objective-c",
+    "onCommand:clang.showExecConf"
   ],
   "main": "./out/src/extension",
   "contributes": {
+    "commands": [{
+        "command": "clang.showExecConf",
+        "title": "Show Executable and Compile Options",
+        "category": "Clang"
+    }],
     "configuration": {
       "type": "object",
       "title": "Clang configulation",

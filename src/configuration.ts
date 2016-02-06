@@ -30,3 +30,22 @@ export class ConfigurationTester implements vscode.Disposable{
         }
     }
 }
+
+export class ConfigurationViewer implements vscode.Disposable {
+    chan: vscode.OutputChannel;
+    constructor() {
+        this.chan = vscode.window.createOutputChannel('Clang Configuration');
+    }
+    show(document: vscode.TextDocument) {
+        let [command, args] = clang.command(document.languageId)
+        this.chan.clear();
+        this.chan.appendLine(`Executable: ${command}`);
+        args.forEach((arg, i) => {
+            this.chan.appendLine(`Option ${i}: ${arg}`);
+        });
+        this.chan.show(vscode.ViewColumn.Two);    
+    }
+    dispose() {
+        this.chan.dispose();
+    }
+}
