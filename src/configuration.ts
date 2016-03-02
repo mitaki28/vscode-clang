@@ -38,12 +38,14 @@ export class ConfigurationViewer implements vscode.Disposable {
     }
     show(document: vscode.TextDocument) {
         let [command, args] = clang.command(document.languageId)
+        this.chan.show();        
         this.chan.clear();
-        this.chan.appendLine(`Executable: ${command}`);
+        let buf = [] 
+        buf.push(`Executable: ${command}`);
         args.forEach((arg, i) => {
-            this.chan.appendLine(`Option ${i}: ${arg}`);
+             buf.push(`Option ${i}: ${arg}`);
         });
-        this.chan.show(vscode.ViewColumn.Two);    
+        this.chan.appendLine(buf.join('\n'));
     }
     dispose() {
         this.chan.dispose();
