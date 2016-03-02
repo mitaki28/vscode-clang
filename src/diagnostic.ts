@@ -30,7 +30,8 @@ function delay(token: vscode.CancellationToken): Thenable<void> {
     });
 }
 
-export function registerDiagnosticProvider(selector: vscode.DocumentSelector, provider: DiagnosticProvider, collection: vscode.DiagnosticCollection) : vscode.Disposable {
+export function registerDiagnosticProvider(selector: vscode.DocumentSelector, provider: DiagnosticProvider, name: string) : vscode.Disposable {
+    let collection: vscode.DiagnosticCollection = vscode.languages.createDiagnosticCollection(name);
     let cancellers = new Map<string, vscode.CancellationTokenSource>();
     let subsctiptions: vscode.Disposable[] = [];
     vscode.workspace.onDidChangeTextDocument((change) => {
@@ -53,6 +54,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
     }, null, subsctiptions);
     return {
         dispose() {
+            collection.dispose();
             for (let canceller of Array.from(cancellers.values())) {
                 canceller.dispose();
             }

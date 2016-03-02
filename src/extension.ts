@@ -10,6 +10,50 @@ const CLANG_MODE: vscode.DocumentSelector = [
     { language: 'objective-c', scheme: 'file' }
 ];
 
+class ResidentExtension implements vscode.Disposable {
+    extensions: Map<string, vscode.Disposable>;
+    constructor() {
+        this.extensions = new Map<string, vscode.Disposable>();
+        this.update();
+    }
+    private _updateProvider(enable: boolean, name: string, create: () => vscode.Disposable): void {
+        if (enable && !this.extensions.has(name)) {
+            this.extensions.set(name, create());
+        } else if (!enable && this.extensions.has(name)) {
+            this.extensions.get(name).dispose();
+            this.extensions.delete(name);
+        }
+    }
+    
+    update() {
+        let conf = vscode.workspace.getConfiguration('clang');
+        this._updateProvider(
+            conf.get<boolean>('enableCompletion'),
+            'completion',
+            () => vscode.languages.registerCompletionItemProvider(
+                CLANG_MODE,
+                new completion.ClangCompletionItemProvider(),
+                '.', ':', '>'
+            )
+        );
+        this._updateProvider(
+            conf.get<boolean>('enableDiagnostic'),
+            'diagnostic',
+            () => diagnostic.registerDiagnosticProvider(
+                CLANG_MODE,
+                new diagnostic.ClangDiagnosticProvider,
+                'clang'
+            )
+        );
+    }
+    
+    dispose() {
+        for (let disposable of Array.from(this.extensions.values())) {
+            disposable.dispose();
+        }
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
     
     let confViewer = new configuration.ConfigurationViewer;
@@ -35,22 +79,12 @@ export function activate(context: vscode.ExtensionContext) {
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
     
-    context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-            CLANG_MODE,
-            new completion.ClangCompletionItemProvider(),
-            '.', ':', '>'
-        ));
 
-
-    let diagnosticCollection = vscode.languages.createDiagnosticCollection('clang');
-    context.subscriptions.push(diagnosticCollection);
-    context.subscriptions.push(
-        diagnostic.registerDiagnosticProvider(
-            CLANG_MODE,
-            new diagnostic.ClangDiagnosticProvider,
-            diagnosticCollection
-        ));
+    let residentExtension: ResidentExtension = new ResidentExtension();
+    context.subscriptions.push(residentExtension);
+    vscode.workspace.onDidChangeConfiguration(() => {
+        residentExtension.update();
+    }, null, subscriptions);
     context.subscriptions.push(vscode.Disposable.from(...subscriptions));
 }
 

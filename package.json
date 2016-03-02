@@ -2,7 +2,7 @@
   "name": "vscode-clang",
   "displayName": "C/C++ Clang",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "publisher": "mitaki28",
   "license": "MIT",
   "repository": {
@@ -71,7 +71,17 @@
            "type": "number",
            "default": 500,
            "description": "The delay after which diagnostic starts (in millisecond)"
-        }             
+        } ,
+        "clang.enableCompletion": {
+             "type": "boolean",
+             "default": true,
+             "description": "Enable completion"
+        },
+        "clang.enableDiagnostic": {
+             "type": "boolean",
+             "default": true,
+             "description": "Enable diagnostic"
+        }   
       }
     }
   },
