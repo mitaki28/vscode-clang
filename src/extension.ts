@@ -35,12 +35,14 @@ export function activate(context: vscode.ExtensionContext) {
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
     
-    context.subscriptions.push(
-        vscode.languages.registerCompletionItemProvider(
-            CLANG_MODE,
-            new completion.ClangCompletionItemProvider(),
-            '.', ':', '>'
-        ));
+    if(vscode.workspace.getConfiguration('clang').get('enableCompletion')) {
+        context.subscriptions.push(
+            vscode.languages.registerCompletionItemProvider(
+                CLANG_MODE,
+                new completion.ClangCompletionItemProvider(),
+                '.', ':', '>'
+            ));
+    }
 
 
     let diagnosticCollection = vscode.languages.createDiagnosticCollection('clang');
