@@ -3,6 +3,7 @@ import * as child_process from 'child_process';
 import * as path from 'path';
 
 import * as clang from './clang';
+import * as execution from './execution';
 
 export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
@@ -92,37 +93,32 @@ function parseRanges(s: string): vscode.Range[] {
 export class ClangDiagnosticProvider implements DiagnosticProvider {
     provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]> {
         return this.fetchDiagnostic(document, token)
-        .then((data) => {
-            return this.parseDiagnostic(data);
-        });
+        .then(
+            (data) => {
+                return this.parseDiagnostic(data);
+            },
+            (e: execution.FailedExecution) => {
+                if (e.errorCode === execution.ErrorCode.BufferLimitExceed) {
+                    vscode.window.showWarningMessage(
+                        'Diagnostic was interpreted due to rack of buffer size. ' +
+                        'The buffer size can be increased using `clang.diagnostic.maxBuffer`. '
+                    );
+                }
+                return '';
+            }
+        );
     }
 
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
-        return new Promise((resolve, reject) => {
-            let [cmd, args] = clang.check(document.languageId);
-            let proc = child_process.execFile(cmd, args, 
-                {
-                    cwd: path.dirname(document.uri.fsPath),
-                    maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')                    
-                },
-                (error, stdout, stderr) => {
-                    if (error != null && error.message === 'stdout maxBuffer exceeded.') {
-                        vscode.window.showWarningMessage(
-                            'Diagnostic was interpreted due to rack of buffer size. ' +
-                            'The buffer size can be increased using `clang.diagnostic.maxBuffer`. '
-                        );
-                        reject();                     
-                    } else {
-                        resolve(stderr);                        
-                    }
-                }
-            );
-            proc.stdin.end(document.getText());
-            token.onCancellationRequested(() => {
-                reject();
-                proc.kill();
-            });
-        });    
+        let [cmd, args] = clang.check(document.languageId);
+        return execution.processString(cmd, args, 
+            {
+                cwd: path.dirname(document.uri.fsPath),
+                maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')                    
+            },
+            token,
+            document.getText()
+        ).then((result) => result.stderr.toString());   
     }
 
     parseDiagnostic(data: string): vscode.Diagnostic[] {

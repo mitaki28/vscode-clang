@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as child_process from 'child_process';
 
 import * as clang from './clang';
+import * as execution from './execution';
 
 export const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
 export const descriptionRe = /^(.*?)(?: : (.*))?$/;
@@ -29,40 +30,35 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
 export class ClangCompletionItemProvider implements vscode.CompletionItemProvider {
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
         return this.fetchCompletionItems(document, position, token)
-        .then((data) => {
-            return this.parseCompletionItems(data);
-        }, (_) => { /* do nothing */ });
+        .then(
+            (data) => {
+                return this.parseCompletionItems(data);
+            },
+            (e: execution.FailedExecution) => {
+                if (e.errorCode === execution.ErrorCode.BufferLimitExceed) {
+                    vscode.window.showWarningMessage(
+                        'Completion was interpreted due to rack of buffer size. ' +
+                        'The buffer size can be increased using `clang.completion.maxBuffer`. '
+                    );                    
+                }
+                return [];
+            }
+        );
     }
     
     fetchCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<string> {
-        return new Promise((resolve, reject) => {
-            // Currently, Clang does NOT complete token partially 
-            // So we find a previous delimiter and start complete from there.
-            let delPos = findPreviousDelimiter(document, position);
-            let [cmd, args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
-            let proc = child_process.execFile(cmd, args, 
-                {
-                    cwd: path.dirname(document.uri.fsPath),
-                    maxBuffer: clang.getConf<number>('completion.maxBuffer')
-                },
-                (error, stdout, stderr) => {
-                    if (error != null && error.message === 'stdout maxBuffer exceeded.') {
-                        vscode.window.showWarningMessage(
-                            'Completion was interpreted due to rack of buffer size. ' +
-                            'The buffer size can be increased using `clang.completion.maxBuffer`. '
-                        );
-                        reject();                     
-                    } else {
-                        resolve(stdout);                        
-                    }
-                }
-            );
-            proc.stdin.end(document.getText());
-            token.onCancellationRequested(() => {
-                proc.kill();
-                reject();
-            });
-        });        
+        // Currently, Clang does NOT complete token partially 
+        // So we find a previous delimiter and start complete from there.
+        let delPos = findPreviousDelimiter(document, position);
+        let [cmd, args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
+        return execution.processString(cmd, args, 
+            {
+                cwd: path.dirname(document.uri.fsPath),
+                maxBuffer: clang.getConf<number>('completion.maxBuffer')
+            },
+            token,
+            document.getText()
+        ).then((result) => result.stdout.toString());      
     }
     
     parseCompletionItem(line: string): vscode.CompletionItem|void {
