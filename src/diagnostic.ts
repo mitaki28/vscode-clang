@@ -106,7 +106,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
                     maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')                    
                 },
                 (error, stdout, stderr) => {
-                    if (error.message === 'stdout maxBuffer exceeded.') {
+                    if (error != null && error.message === 'stdout maxBuffer exceeded.') {
                         vscode.window.showWarningMessage(
                             'Diagnostic was interpreted due to rack of buffer size. ' +
                             'The buffer size can be increased using `clang.diagnostic.maxBuffer`. '

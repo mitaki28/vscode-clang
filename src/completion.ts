@@ -46,7 +46,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
                     maxBuffer: clang.getConf<number>('completion.maxBuffer')
                 },
                 (error, stdout, stderr) => {
-                    if (error.message === 'stdout maxBuffer exceeded.') {
+                    if (error != null && error.message === 'stdout maxBuffer exceeded.') {
                         vscode.window.showWarningMessage(
                             'Completion was interpreted due to rack of buffer size. ' +
                             'The buffer size can be increased using `clang.completion.maxBuffer`. '
