@@ -68,12 +68,12 @@
           "description": "Compiler options for Objective-C"
         },
         
-        "clang.enableDiagnostic": {
+        "clang.diagnostic.enable": {
              "type": "boolean",
              "default": true,
              "description": "Enable diagnostic"
-        },        
-        "clang.diagnosticDelay": {
+        },     
+        "clang.diagnostic.delay": {
            "type": "number",
            "default": 500,
            "description": "The delay after which diagnostic starts (in millisecond)"
@@ -84,7 +84,7 @@
              "description": "Tolerable size of the clang output for diagnostic. "
         },        
         
-        "clang.enableCompletion": {
+        "clang.completion.enable": {
              "type": "boolean",
              "default": true,
              "description": "Enable completion"

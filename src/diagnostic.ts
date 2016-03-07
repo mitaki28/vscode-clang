@@ -22,7 +22,7 @@ function delay(token: vscode.CancellationToken): Thenable<void> {
     return new Promise<void>((resolve, reject) => {
         let timer = setTimeout(() => {
             resolve();
-        }, vscode.workspace.getConfiguration('clang').get<number>('diagnosticDelay'));
+        }, clang.getConf<number>('diagnostic.delay'));
         token.onCancellationRequested(() => {
             clearTimeout(timer);
             reject();
@@ -99,12 +99,11 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
 
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
-            let conf = vscode.workspace.getConfiguration('clang');            
             let [cmd, args] = clang.check(document.languageId);
             let proc = child_process.execFile(cmd, args, 
                 {
                     cwd: path.dirname(document.uri.fsPath),
-                    maxBuffer: conf.get<number>('diagnostic.maxBuffer')                    
+                    maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')                    
                 },
                 (error, stdout, stderr) => {
                     if (error.message === 'stdout maxBuffer exceeded.') {

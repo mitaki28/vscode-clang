@@ -1,23 +1,49 @@
-import * as path from "path"
+import * as path from 'path';
 import * as child_process from 'child_process';
 
 import * as vscode from 'vscode';
 
-import * as variable from "./variable"
+import * as variable from './variable';
+
+const deprecatedMap: Map<string, string> = new Map<string, string>(
+    new Array<[string, string]>( 
+        ['diagnostic.delay', 'diagnosticDelay'],
+        ['diagnostic.enable', 'enableDiagnostic'],
+        ['completion.enable', 'enableCompletion']        
+    )
+);
+
+export function getConf<T>(name: string): T {
+    let conf = vscode.workspace.getConfiguration('clang');
+    if (deprecatedMap.has(name)) {
+        let depName = deprecatedMap.get(name);
+        let value = conf.get<T>(depName);
+        if (value != null) {
+            vscode.window.showWarningMessage(
+                `clang.${depName} is deprecated. Please use ${name} instead.`
+            );
+            return value;
+        }
+    }
+    let value = conf.get<T>(name);
+    if (value == null) {
+        vscode.window.showErrorMessage(`Error: invalid configuration ${name}`);
+    }
+    return value;
+}
 
 export function command(language: string, ...options: string[]): [string, string[]] {
-    let clangConf = vscode.workspace.getConfiguration('clang');
-    let cmd = variable.resolve(clangConf.get<string>('executable'));
+    let cmd = variable.resolve(getConf<string>('executable'));
     let args: string[] = [];    
     if (language === 'cpp') {
         args.push('-x', 'c++');        
-        args.push(...clangConf.get<string[]>('cxxflags').map(variable.resolve));
+        args.push(...getConf<string[]>('cxxflags').map(variable.resolve));
     } else if (language === 'c') {
         args.push('-x', 'c');        
-        args.push(...clangConf.get<string[]>('cflags').map(variable.resolve));
+        args.push(...getConf<string[]>('cflags').map(variable.resolve));
     } else if (language === 'objective-c') {
         args.push('-x', 'objective-c');        
-        args.push(...clangConf.get<string[]>('objcflags').map(variable.resolve));
+        args.push(...getConf<string[]>('objcflags').map(variable.resolve));
     }
     args.push(...options);
     return [cmd, args];

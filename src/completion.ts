@@ -38,13 +38,12 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         return new Promise((resolve, reject) => {
             // Currently, Clang does NOT complete token partially 
             // So we find a previous delimiter and start complete from there.
-            let conf = vscode.workspace.getConfiguration('clang');
             let delPos = findPreviousDelimiter(document, position);
             let [cmd, args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
             let proc = child_process.execFile(cmd, args, 
                 {
                     cwd: path.dirname(document.uri.fsPath),
-                    maxBuffer: conf.get<number>('completion.maxBuffer')
+                    maxBuffer: clang.getConf<number>('completion.maxBuffer')
                 },
                 (error, stdout, stderr) => {
                     if (error.message === 'stdout maxBuffer exceeded.') {

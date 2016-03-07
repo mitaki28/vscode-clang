@@ -26,9 +26,8 @@ class ResidentExtension implements vscode.Disposable {
     }
     
     update() {
-        let conf = vscode.workspace.getConfiguration('clang');
         this._updateProvider(
-            conf.get<boolean>('enableCompletion'),
+            clang.getConf<boolean>('completion.enable'),
             'completion',
             () => vscode.languages.registerCompletionItemProvider(
                 CLANG_MODE,
@@ -37,7 +36,7 @@ class ResidentExtension implements vscode.Disposable {
             )
         );
         this._updateProvider(
-            conf.get<boolean>('enableDiagnostic'),
+            clang.getConf<boolean>('diagnostic.enable'),
             'diagnostic',
             () => diagnostic.registerDiagnosticProvider(
                 CLANG_MODE,
