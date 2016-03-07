@@ -50,13 +50,16 @@ export function command(language: string, ...options: string[]): [string, string
 }
 
 export function complete(language: string, line: number, char: number): [string, string[]] {
-    return command(language, 
-            '-fsyntax-only',
-            '-fparse-all-comments',
-            '-Xclang', '-code-completion-macros',
-            '-Xclang', '-code-completion-brief-comments',
-            '-Xclang', `-code-completion-at=<stdin>:${line}:${char}`,
-            '-');    
+    let args = [];
+    args.push('-fsyntax-only');
+    args.push('-fparse-all-comments');
+    if (getConf<boolean>('completion.completeMacros')) {
+        args.push('-Xclang', '-code-completion-macros');        
+    }
+    args.push('-Xclang', '-code-completion-brief-comments');
+    args.push('-Xclang', `-code-completion-at=<stdin>:${line}:${char}`);
+    args.push('-');
+    return command(language, ...args);    
 }
 
 export function check(language: string): [string, string[]] {

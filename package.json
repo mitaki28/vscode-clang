@@ -98,7 +98,12 @@
              "type": "array",
              "default": [".", ":", ">"],
              "description": "Trigger completion when the user types one of the characters"
-        }        
+        },
+        "clang.completion.completeMacros": {
+            "type": "boolean",
+            "default": true,
+             "description": "Complete macros"
+        }  
       }
     }
   },
