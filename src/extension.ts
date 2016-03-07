@@ -17,23 +17,37 @@ class ResidentExtension implements vscode.Disposable {
         this.update();
     }
     private _updateProvider(enable: boolean, name: string, create: () => vscode.Disposable): void {
-        if (enable && !this.extensions.has(name)) {
-            this.extensions.set(name, create());
-        } else if (!enable && this.extensions.has(name)) {
+        if (this.extensions.has(name)) {
             this.extensions.get(name).dispose();
             this.extensions.delete(name);
-        }
+        }        
+        if (enable) {
+            this.extensions.set(name, create());
+        } 
     }
     
     update() {
         this._updateProvider(
             clang.getConf<boolean>('completion.enable'),
             'completion',
-            () => vscode.languages.registerCompletionItemProvider(
-                CLANG_MODE,
-                new completion.ClangCompletionItemProvider(),
-                '.', ':', '>'
-            )
+            () => {
+                let triggers = clang.getConf<[string]>('completion.triggerChars');
+                let filteredTriggers = [];
+                for (let t of triggers) {
+                    if (typeof t === 'string' && t.length === 1) {
+                        filteredTriggers.push(t);
+                    } else {
+                        vscode.window.showErrorMessage(
+                            `length of trigger character must be 1. ${t} is ignored.`
+                        )
+                    }
+                }
+                return vscode.languages.registerCompletionItemProvider(
+                    CLANG_MODE,
+                    new completion.ClangCompletionItemProvider(),
+                    ...filteredTriggers
+                )
+            }
         );
         this._updateProvider(
             clang.getConf<boolean>('diagnostic.enable'),

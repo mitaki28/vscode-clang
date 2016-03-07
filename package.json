@@ -93,7 +93,12 @@
              "type": "number",
              "default": 8388608,
              "description": "Tolerable size of the clang output for completion. "
-        }
+        },
+        "clang.completion.triggerChars": {
+             "type": "array",
+             "default": [".", ":", ">"],
+             "description": "Trigger completion when the user types one of the characters"
+        }        
       }
     }
   },
