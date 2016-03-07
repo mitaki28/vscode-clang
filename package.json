@@ -2,7 +2,7 @@
   "name": "vscode-clang",
   "displayName": "C/C++ Clang",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "mitaki28",
   "license": "MIT",
   "repository": {
@@ -81,7 +81,7 @@
         "clang.diagnostic.maxBuffer": {
              "type": "number",
              "default": 262144,
-             "description": "Tolerable size of the clang output for diagnostic. "
+             "description": "Tolerable size of the clang output for diagnostic"
         },        
         
         "clang.completion.enable": {
@@ -92,7 +92,7 @@
         "clang.completion.maxBuffer": {
              "type": "number",
              "default": 8388608,
-             "description": "Tolerable size of the clang output for completion. "
+             "description": "Tolerable size of the clang output for completion"
         },
         "clang.completion.triggerChars": {
              "type": "array",
