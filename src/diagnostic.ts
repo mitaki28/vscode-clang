@@ -99,11 +99,23 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
 
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
         return new Promise((resolve, reject) => {
+            let conf = vscode.workspace.getConfiguration('clang');            
             let [cmd, args] = clang.check(document.languageId);
             let proc = child_process.execFile(cmd, args, 
-                {cwd: path.dirname(document.uri.fsPath)},
+                {
+                    cwd: path.dirname(document.uri.fsPath),
+                    maxBuffer: conf.get<number>('diagnostic.maxBuffer')                    
+                },
                 (error, stdout, stderr) => {
-                    resolve(stderr);
+                    if (error.message === 'stdout maxBuffer exceeded.') {
+                        vscode.window.showWarningMessage(
+                            'Diagnostic was interpreted due to rack of buffer size. ' +
+                            'The buffer size can be increased using `clang.diagnostic.maxBuffer`. '
+                        );
+                        reject();                     
+                    } else {
+                        resolve(stderr);                        
+                    }
                 }
             );
             proc.stdin.end(document.getText());
