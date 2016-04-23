@@ -14,8 +14,8 @@ export enum ErrorCode {
 
 export interface Result {
     error: Error,
-    stdout: Buffer,
-    stderr: Buffer
+    stdout: string,
+    stderr: string
 }
 
 export interface FailedExecution {
