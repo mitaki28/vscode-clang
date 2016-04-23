@@ -84,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(confTester);
     let subscriptions: vscode.Disposable[] = [];
     vscode.window.onDidChangeActiveTextEditor((editor) => {
-        if (!vscode.languages.match(CLANG_MODE, editor.document)) return;
+        if (!editor || !vscode.languages.match(CLANG_MODE, editor.document)) return;
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
     
