@@ -5,7 +5,7 @@ Completion and Diagnostic for C/C++/Objective-C using [Clang](http://clang.llvm.
 ## Requirements
 
 - Install [Clang](http://clang.llvm.org/)
-    - For Max OS X, Clang is installed with XCode Command Line Tools and `PATH` is configured automatically. 
+    - For Max OS X, Clang is installed with Xcode Command Line Tools and `PATH` is configured automatically. 
 - Configure the `PATH` environment variable so that you can execute `clang` command.
     - or specify `clang.executable` configuration (See the next section for detail) 
 
