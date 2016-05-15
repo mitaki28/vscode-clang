@@ -5,7 +5,9 @@ import * as path from 'path';
 import * as clang from './clang';
 import * as execution from './execution';
 
-export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;  
+import {CompilationDatabase} from './compile_db';
+
+export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch(str) {
         case 'fatal error': return vscode.DiagnosticSeverity.Error;
@@ -45,7 +47,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
         cancellers.set(uriStr, new vscode.CancellationTokenSource);
         delay(cancellers.get(uriStr).token).then(() => {
             cancellers.get(uriStr).dispose();
-            cancellers.set(uriStr, new vscode.CancellationTokenSource);                            
+            cancellers.set(uriStr, new vscode.CancellationTokenSource);
             return provider.provideDiagnostic(change.document, cancellers.get(uriStr).token);
         }).then((diagnostics) => {
             cancellers.get(uriStr).dispose();
@@ -59,7 +61,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
             for (let canceller of Array.from(cancellers.values())) {
                 canceller.dispose();
             }
-            vscode.Disposable.from(...subsctiptions).dispose();  
+            vscode.Disposable.from(...subsctiptions).dispose();
         }
     };
 }
@@ -91,6 +93,8 @@ function parseRanges(s: string): vscode.Range[] {
 }
 
 export class ClangDiagnosticProvider implements DiagnosticProvider {
+    private _compilationDatabase: CompilationDatabase = CompilationDatabase.openDefault();
+
     provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]> {
         return this.fetchDiagnostic(document, token)
         .then(
@@ -110,15 +114,17 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
     }
 
     fetchDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<string> {
-        let [cmd, args] = clang.check(document.languageId);
-        return execution.processString(cmd, args, 
+        let [cmd, base_args] = clang.check(document.languageId);
+        const info = this._compilationDatabase.infoForDocument(document.fileName);
+        const args = base_args.concat(info.args);
+        return execution.processString(cmd, args,
             {
-                cwd: path.dirname(document.uri.fsPath),
-                maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')                    
+                cwd: info.cwd || path.dirname(document.uri.fsPath),
+                maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')
             },
             token,
             document.getText()
-        ).then((result) => result.stderr.toString());   
+        ).then((result) => result.stderr.toString());
     }
 
     parseDiagnostic(data: string): vscode.Diagnostic[] {
@@ -135,9 +141,9 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
                 let ranges = parseRanges(matched[3]);
                 range = new vscode.Range(
                     ranges[0].start.line - 1,
-                    ranges[0].start.character - 1,                    
+                    ranges[0].start.character - 1,
                     ranges[ranges.length - 1].end.line - 1,
-                    ranges[ranges.length - 1].end.character - 1                    
+                    ranges[ranges.length - 1].end.character - 1
                 );
             }
             let msg: string = matched[5];
@@ -145,6 +151,6 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
 
             result.push(new vscode.Diagnostic(range, msg, type));
         });
-        return result; 
-    }    
+        return result;
+    }
 }
