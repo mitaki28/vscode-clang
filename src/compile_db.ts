@@ -38,9 +38,12 @@ export class CompilationDatabase {
 
     constructor(dbpath: string) {
         this.databasePath = dbpath;
+        // We reload our compile flags when the database file changes. We don't
+        // want to read the db file each time we ask for flags, as this can add
+        // latency to completions, especially on systems with slower filesystems
         const watcher = this._watcher = vscode.workspace.createFileSystemWatcher(this.databasePath);
-        watcher.onDidChange(this._reloadDatabase);
-        watcher.onDidCreate(this._reloadDatabase);
+        watcher.onDidCreate(this._reloadDatabase.bind(this));
+        watcher.onDidChange(this._reloadDatabase.bind(this));
     }
 
     public static openDefault(): CompilationDatabase {
