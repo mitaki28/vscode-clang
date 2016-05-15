@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as vscode from 'vscode';
 
 import * as variable from './variable';
+import * as clang from './clang';
 
 /// Represents an entry in a compilation database
 export interface CompilationDatabaseEntry {
@@ -46,10 +47,15 @@ export class CompilationDatabase {
         watcher.onDidChange(this._reloadDatabase.bind(this));
     }
 
+    // Open the default compilation database file
     public static openDefault(): CompilationDatabase {
-        const bindir_ = vscode.workspace.getConfiguration('cmake').get<string>('buildDirectory') || '${workspaceRoot}/build';
-        const bindir = variable.resolve(bindir_);
-        return new CompilationDatabase(path.join(bindir, 'compile_commands.json'));
+        let db_path = clang.getConf<string>('compilationDatabase');
+        if (!db_path) {
+            const bindir = vscode.workspace.getConfiguration('cmake').get<string>('buildDirectory') || '${workspaceRoot}/build';
+            db_path = path.join(bindir, 'compile_commands.json');
+        }
+        db_path = variable.resolve(db_path);
+        return new CompilationDatabase(db_path);
     }
 
     /// Reload the content of the database

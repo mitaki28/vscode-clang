@@ -10,7 +10,7 @@
       "url": "https://github.com/mitaki28/vscode-clang"
   },
   "bugs": {
-    "url": "https://github.com/mitaki28/vscode-clang/issues"  
+    "url": "https://github.com/mitaki28/vscode-clang/issues"
   },
   "homepage": "https://github.com/mitaki28/vscode-clang",
   "engines": {
@@ -67,12 +67,17 @@
           "default": [],
           "description": "Compiler options for Objective-C"
         },
-        
+        "clang.compilationDatabase": {
+          "type": "string",
+          "default": "",
+          "description": "The path to a compilation database file"
+        },
+
         "clang.diagnostic.enable": {
              "type": "boolean",
              "default": true,
              "description": "Enable diagnostic"
-        },     
+        },
         "clang.diagnostic.delay": {
            "type": "number",
            "default": 500,
@@ -82,8 +87,8 @@
              "type": "number",
              "default": 262144,
              "description": "Tolerable size of the clang output for diagnostic"
-        },        
-        
+        },
+
         "clang.completion.enable": {
              "type": "boolean",
              "default": true,
@@ -103,7 +108,7 @@
             "type": "boolean",
             "default": true,
              "description": "Complete macros"
-        }  
+        }
       }
     }
   },
