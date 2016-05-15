@@ -142,7 +142,7 @@ export class CompilationDatabase {
             .replace('source/', '')
             .replace('include/', '')
             .replace('src/', '')
-            .replace('include/')
+            .replace('inc/')
             .replace('.hpp', '')
             .replace('.hxx', '')
             .replace('.h++', '')
