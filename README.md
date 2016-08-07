@@ -21,7 +21,7 @@ You can use configuration interface of Visual Studio Code. (Press `F1` and type 
 
 - `clang.completion.enable`: Enable/disable completion feature (default: `true`)
 - `clang.completion.maxBuffer`: Tolerable size of clang output for completion (default: `8 * 1024 * 1024` bytes)
-- `clang.completion.triggerChars`: Trigger completion when the user types one of the characters (default: `[".". ":", ">"]`)
+- `clang.completion.triggerChars`: Trigger completion when the user types one of the characters (default: `[".", ":", ">"]`)
 
 ### Diagnostic
 
