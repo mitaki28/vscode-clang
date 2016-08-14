@@ -5,7 +5,6 @@
 
 // The module 'assert' provides assertion methods from node
 import * as assert from 'assert';
-assert.equal = assert.strictEqual;
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
@@ -23,7 +22,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, undefined);
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
     test('const method', () => {
@@ -34,7 +33,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, undefined);
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -46,7 +45,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, undefined);
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -58,7 +57,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'f function');
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -70,7 +69,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'f function : g function');
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -82,7 +81,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'f function');
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -94,7 +93,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'f function');
             assert.equal(item.kind, vscode.CompletionItemKind.Function);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -106,7 +105,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'fuga struct');
             assert.equal(item.kind, vscode.CompletionItemKind.Class);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -118,7 +117,7 @@ suite("Completion Tests", () => {
             assert.equal(item.documentation, 'fuga struct');
             assert.equal(item.kind, vscode.CompletionItemKind.Class);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -128,9 +127,9 @@ suite("Completion Tests", () => {
             assert.equal(item.label, 'wchar_t');
             assert.equal(item.detail, 'wchar_t');
             assert.equal(item.documentation, undefined);
-            assert.equal(item.kind, vscode.CompletionItemKind.Class);            
+            assert.equal(item.kind, vscode.CompletionItemKind.Class);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -140,9 +139,9 @@ suite("Completion Tests", () => {
             assert.equal(item.label, 'hoge');
             assert.equal(item.detail, 'int hoge');
             assert.equal(item.documentation, 'int variable');
-            assert.equal(item.kind, vscode.CompletionItemKind.Variable);            
+            assert.equal(item.kind, vscode.CompletionItemKind.Variable);
         } else {
-            assert.fail();
+            assert(false);
         }
     });
 
@@ -167,7 +166,7 @@ suite("Completion Tests", () => {
                 assert.equal(item.documentation, undefined);
                 assert.equal(item.kind, vscode.CompletionItemKind.Function);
             } else {
-                assert.fail();
+                assert(false);
             }
             var item = items[1];
             if (item instanceof vscode.CompletionItem) {
@@ -176,7 +175,7 @@ suite("Completion Tests", () => {
                 assert.equal(item.documentation, undefined);
                 assert.equal(item.kind, vscode.CompletionItemKind.Function);
             } else {
-                assert.fail();
+                assert(false);
             }
             var item = items[2];
             if (item instanceof vscode.CompletionItem) {
@@ -185,8 +184,8 @@ suite("Completion Tests", () => {
                 assert.equal(item.documentation, undefined);
                 assert.equal(item.kind, vscode.CompletionItemKind.Function);
             } else {
-                assert.fail();
-            }               
-        }      
+                assert(false);
+            }
+        }
     });
 });

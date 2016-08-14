@@ -11,8 +11,6 @@ import * as assert from 'assert';
 import * as vscode from 'vscode';
 import * as diagnostic from '../src/diagnostic';
 
-assert.equal = assert.strictEqual;
-
 const fixtures = [
     `<stdin>:23:45:{1:12-23:45}: error: no member named 'vect' in namespace 'std'`,
     `<stdin>:23:45:{1:12-23:45}{56:67-78:89}: error: no member named 'vect' in namespace 'std'`,
