@@ -1,10 +1,10 @@
-import * as child_process from 'child_process';
+import * as child_process from "child_process";
 
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
 export interface Option {
-    cwd: string,
-    maxBuffer: number
+    cwd: string;
+    maxBuffer: number;
 }
 
 export enum ErrorCode {
@@ -13,9 +13,9 @@ export enum ErrorCode {
 }
 
 export interface Result {
-    error: Error,
-    stdout: string,
-    stderr: string
+    error: Error;
+    stdout: string;
+    stderr: string;
 }
 
 export interface FailedExecution {
@@ -27,7 +27,7 @@ export function processString(cmd: string, args: string[], opt: Option, token: v
     return new Promise((resolve, reject) => {
         let proc = child_process.execFile(cmd, args, opt,
             (error, stdout, stderr) => {
-                if (error != null && error.message === 'stdout maxBuffer exceeded.') {
+                if (error != null && error.message === "stdout maxBuffer exceeded.") {
                     reject(<FailedExecution>{
                         errorCode: ErrorCode.BufferLimitExceed,
                         result: <Result>{ error, stdout, stderr }

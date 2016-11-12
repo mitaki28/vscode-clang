@@ -1,29 +1,29 @@
-import * as vscode from 'vscode';
-import * as child_process from 'child_process';
-import * as path from 'path';
+import * as vscode from "vscode";
+import * as child_process from "child_process";
+import * as path from "path";
 
-import * as clang from './clang';
-import * as execution from './execution';
+import * as clang from "./clang";
+import * as execution from "./execution";
 
 export const diagnosticRe = /^\<stdin\>:(\d+):(\d+):(?:((?:\{.+?\})+):)? ((?:fatal )?error|warning): (.*?)$/;
 function str2diagserv(str: string): vscode.DiagnosticSeverity {
     switch (str) {
-        case 'fatal error': return vscode.DiagnosticSeverity.Error;
-        case 'error': return vscode.DiagnosticSeverity.Error;
-        case 'warning': return vscode.DiagnosticSeverity.Warning;
+        case "fatal error": return vscode.DiagnosticSeverity.Error;
+        case "error": return vscode.DiagnosticSeverity.Error;
+        case "warning": return vscode.DiagnosticSeverity.Warning;
         default: return vscode.DiagnosticSeverity.Information;
     }
 }
 
 export interface DiagnosticProvider {
-    provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]>
+    provideDiagnostic(document: vscode.TextDocument, token: vscode.CancellationToken): Thenable<vscode.Diagnostic[]>;
 }
 
 function delay(token: vscode.CancellationToken): Thenable<void> {
     return new Promise<void>((resolve, reject) => {
         let timer = setTimeout(() => {
             resolve();
-        }, clang.getConf<number>('diagnostic.delay'));
+        }, clang.getConf<number>("diagnostic.delay"));
         token.onCancellationRequested(() => {
             clearTimeout(timer);
             reject();
@@ -72,19 +72,19 @@ function parseRanges(s: string): vscode.Range[] {
             ans = 10 * ans + parseInt(s[p++], 10);
         }
         return ans;
-    }
+    };
     let result: vscode.Range[] = [];
-    while (s[p] == '{') {
-        s[p++]; // s[p] == '{'
+    while (s[p] === "{") {
+        s[p++]; // s[p] == "{"
         let ans = 0;
         let sline = parseDigit();
-        s[p++]; // s[p] == ':'
+        s[p++]; // s[p] == ":"
         let schar = parseDigit();
-        s[p++]; // s[p] == '-'
+        s[p++]; // s[p] == "-"
         let eline = parseDigit();
-        s[p++]; // s[p] == ':'
+        s[p++]; // s[p] == ":"
         let echar = parseDigit();
-        s[p++]; // s[p] == '}'
+        s[p++]; // s[p] == "}"
         result.push(new vscode.Range(sline, schar, eline, echar));
     }
     return result;
@@ -100,11 +100,11 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
             (e: execution.FailedExecution) => {
                 if (e.errorCode === execution.ErrorCode.BufferLimitExceed) {
                     vscode.window.showWarningMessage(
-                        'Diagnostic was interpreted due to rack of buffer size. ' +
-                        'The buffer size can be increased using `clang.diagnostic.maxBuffer`. '
+                        "Diagnostic was interpreted due to rack of buffer size. " +
+                        "The buffer size can be increased using `clang.diagnostic.maxBuffer`. "
                     );
                 }
-                return '';
+                return "";
             }
             );
     }
@@ -114,7 +114,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
         return execution.processString(cmd, args,
             {
                 cwd: path.dirname(document.uri.fsPath),
-                maxBuffer: clang.getConf<number>('diagnostic.maxBuffer')
+                maxBuffer: clang.getConf<number>("diagnostic.maxBuffer")
             },
             token,
             document.getText()
@@ -122,7 +122,7 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
     }
 
     parseDiagnostic(data: string): vscode.Diagnostic[] {
-        let result: vscode.Diagnostic[] = []
+        let result: vscode.Diagnostic[] = [];
         data.split(/\r\n|\r|\n/).forEach((line) => {
             let matched = line.match(diagnosticRe);
             if (!matched) return;

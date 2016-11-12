@@ -1,13 +1,13 @@
-import * as vscode from 'vscode';
-import * as clang from './clang'
-import * as configuration from "./configuration"
-import * as diagnostic from './diagnostic'
-import * as completion from './completion'
+import * as vscode from "vscode";
+import * as clang from "./clang";
+import * as configuration from "./configuration";
+import * as diagnostic from "./diagnostic";
+import * as completion from "./completion";
 
 const CLANG_MODE: vscode.DocumentSelector = [
-    { language: 'cpp', scheme: 'file' },
-    { language: 'c', scheme: 'file' },
-    { language: 'objective-c', scheme: 'file' }
+    { language: "cpp", scheme: "file" },
+    { language: "c", scheme: "file" },
+    { language: "objective-c", scheme: "file" }
 ];
 
 class ResidentExtension implements vscode.Disposable {
@@ -28,34 +28,34 @@ class ResidentExtension implements vscode.Disposable {
 
     update() {
         this._updateProvider(
-            clang.getConf<boolean>('completion.enable'),
-            'completion',
+            clang.getConf<boolean>("completion.enable"),
+            "completion",
             () => {
-                let triggers = clang.getConf<[string]>('completion.triggerChars');
+                let triggers = clang.getConf<[string]>("completion.triggerChars");
                 let filteredTriggers = [];
                 for (let t of triggers) {
-                    if (typeof t === 'string' && t.length === 1) {
+                    if (typeof t === "string" && t.length === 1) {
                         filteredTriggers.push(t);
                     } else {
                         vscode.window.showErrorMessage(
                             `length of trigger character must be 1. ${t} is ignored.`
-                        )
+                        );
                     }
                 }
                 return vscode.languages.registerCompletionItemProvider(
                     CLANG_MODE,
                     new completion.ClangCompletionItemProvider(),
                     ...filteredTriggers
-                )
+                );
             }
         );
         this._updateProvider(
-            clang.getConf<boolean>('diagnostic.enable'),
-            'diagnostic',
+            clang.getConf<boolean>("diagnostic.enable"),
+            "diagnostic",
             () => diagnostic.registerDiagnosticProvider(
                 CLANG_MODE,
                 new diagnostic.ClangDiagnosticProvider,
-                'clang'
+                "clang"
             )
         );
     }
@@ -71,7 +71,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     let confViewer = new configuration.ConfigurationViewer;
     context.subscriptions.push(confViewer);
-    context.subscriptions.push(vscode.commands.registerTextEditorCommand('clang.showExecConf',
+    context.subscriptions.push(vscode.commands.registerTextEditorCommand("clang.showExecConf",
         (editor: vscode.TextEditor, edit: vscode.TextEditorEdit) => {
             if (!vscode.languages.match(CLANG_MODE, editor.document)) {
                 vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C`);

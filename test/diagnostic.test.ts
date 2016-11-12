@@ -4,12 +4,12 @@
 //
 
 // The module 'assert' provides assertion methods from node
-import * as assert from 'assert';
+import * as assert from "assert";
 
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
-import * as vscode from 'vscode';
-import * as diagnostic from '../src/diagnostic';
+import * as vscode from "vscode";
+import * as diagnostic from "../src/diagnostic";
 
 const fixtures = [
     `<stdin>:23:45:{1:12-23:45}: error: no member named 'vect' in namespace 'std'`,
@@ -24,7 +24,7 @@ const fixtures = [
 suite("Diagnostic Tests", () => {
     test("Diagnostic", () => {
         let diag = new diagnostic.ClangDiagnosticProvider;
-        for (let lineEnd of ['\r\n', '\r', '\n']) {
+        for (let lineEnd of ["\r\n", "\r", "\n"]) {
             let result = diag.parseDiagnostic(fixtures.join(lineEnd));
             assert.equal(result[0].severity, vscode.DiagnosticSeverity.Error);
             assert.equal(result[0].range.start.line, 1 - 1);

@@ -1,9 +1,9 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
-import * as child_process from 'child_process';
+import * as vscode from "vscode";
+import * as path from "path";
+import * as child_process from "child_process";
 
-import * as clang from './clang';
-import * as execution from './execution';
+import * as clang from "./clang";
+import * as execution from "./execution";
 
 export const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
 export const descriptionRe = /^(.*?)(?: : (.*))?$/;
@@ -12,10 +12,10 @@ export const argumentTypeRe = /\<#([^#]+)#\>/ig;
 export const optionalArgumentLeftRe = /\{#(,? ?.+?)(?=#\}|\{#)/ig;
 export const optionalArgumentRightRe = /#\}/ig;
 
-const DELIMITERS = '~`!@#$%^&*()-+={}[]|\\\'";:/?<>,. \t\n';
+const DELIMITERS = "~`!@#$%^&*()-+={}[]|\\'\";:/?<>,. \t\n";
 
 function isDelimiter(c: string) {
-    return DELIMITERS.indexOf(c) != -1;
+    return DELIMITERS.indexOf(c) !== -1;
 }
 
 function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
@@ -37,8 +37,8 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             (e: execution.FailedExecution) => {
                 if (e.errorCode === execution.ErrorCode.BufferLimitExceed) {
                     vscode.window.showWarningMessage(
-                        'Completion was interpreted due to rack of buffer size. ' +
-                        'The buffer size can be increased using `clang.completion.maxBuffer`. '
+                        "Completion was interpreted due to rack of buffer size. " +
+                        "The buffer size can be increased using `clang.completion.maxBuffer`. "
                     );
                 }
                 return [];
@@ -54,7 +54,7 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         return execution.processString(cmd, args,
             {
                 cwd: path.dirname(document.uri.fsPath),
-                maxBuffer: clang.getConf<number>('completion.maxBuffer')
+                maxBuffer: clang.getConf<number>("completion.maxBuffer")
             },
             token,
             document.getText()
@@ -78,19 +78,19 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         let hasValue = false;
         signature = signature.replace(returnTypeRe, (match: string, arg: string): string => {
             hasValue = true;
-            return arg + ' ';
+            return arg + " ";
         });
         signature = signature.replace(argumentTypeRe, (match: string, arg: string): string => {
             return arg;
         });
         signature = signature.replace(optionalArgumentLeftRe, (match: string, arg: string): string => {
-            return arg + '=?';
+            return arg + "=?";
         });
         signature = signature.replace(optionalArgumentRightRe, (match: string, arg: string): string => {
-            return '';
+            return "";
         });
         item.detail = signature;
-        if (signature.indexOf('(') != -1) {
+        if (signature.indexOf("(") !== -1) {
             item.kind = vscode.CompletionItemKind.Function;
         } else if (hasValue) {
             item.kind = vscode.CompletionItemKind.Variable;
