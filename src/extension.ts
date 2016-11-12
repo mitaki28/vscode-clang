@@ -20,12 +20,12 @@ class ResidentExtension implements vscode.Disposable {
         if (this.extensions.has(name)) {
             this.extensions.get(name).dispose();
             this.extensions.delete(name);
-        }        
+        }
         if (enable) {
             this.extensions.set(name, create());
-        } 
+        }
     }
-    
+
     update() {
         this._updateProvider(
             clang.getConf<boolean>('completion.enable'),
@@ -59,7 +59,7 @@ class ResidentExtension implements vscode.Disposable {
             )
         );
     }
-    
+
     dispose() {
         for (let disposable of Array.from(this.extensions.values())) {
             disposable.dispose();
@@ -68,18 +68,18 @@ class ResidentExtension implements vscode.Disposable {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    
+
     let confViewer = new configuration.ConfigurationViewer;
     context.subscriptions.push(confViewer);
     context.subscriptions.push(vscode.commands.registerTextEditorCommand('clang.showExecConf',
-    (editor: vscode.TextEditor, edit: vscode.TextEditorEdit) => {
-        if (!vscode.languages.match(CLANG_MODE, editor.document)) {
-            vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C`);
-            return;            
-        }
-        confViewer.show(editor.document);
-    }));    
-    
+        (editor: vscode.TextEditor, edit: vscode.TextEditorEdit) => {
+            if (!vscode.languages.match(CLANG_MODE, editor.document)) {
+                vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C`);
+                return;
+            }
+            confViewer.show(editor.document);
+        }));
+
     let confTester = new configuration.ConfigurationTester;
     context.subscriptions.push(confTester);
     let subscriptions: vscode.Disposable[] = [];
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (!editor || !vscode.languages.match(CLANG_MODE, editor.document)) return;
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
-    
+
 
     let residentExtension: ResidentExtension = new ResidentExtension();
     context.subscriptions.push(residentExtension);
