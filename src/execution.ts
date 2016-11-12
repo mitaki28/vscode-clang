@@ -31,9 +31,9 @@ export function processString(cmd: string, args: string[], opt: Option, token: v
                         reject(<FailedExecution>{
                             errorCode: ErrorCode.BufferLimitExceed,
                             result: <Result>{error, stdout, stderr}
-                        });                     
+                        });
                     } else {
-                        resolve(<Result>{error, stdout, stderr});                        
+                        resolve(<Result>{error, stdout, stderr});
                     }
                 }
             );
