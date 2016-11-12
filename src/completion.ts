@@ -5,6 +5,8 @@ import * as child_process from 'child_process';
 import * as clang from './clang';
 import * as execution from './execution';
 
+import {CompilationDatabase} from './compile_db';
+
 export const completionRe = /^COMPLETION: (.*?)(?: : (.*))?$/;
 export const descriptionRe = /^(.*?)(?: : (.*))?$/;
 export const returnTypeRe = /\[#([^#]+)#\]/ig;
@@ -23,11 +25,13 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
     let char = position.character;
     const s = document.getText(new vscode.Range(line, 0, line, char));
     while (char > 0 && !isDelimiter(s[char - 1])) char--;
-    return new vscode.Position(line, char); 
+    return new vscode.Position(line, char);
 }
 
 
 export class ClangCompletionItemProvider implements vscode.CompletionItemProvider {
+    private _compilationDatabase: CompilationDatabase = CompilationDatabase.openDefault();
+
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<vscode.CompletionItem[]> {
         return this.fetchCompletionItems(document, position, token)
         .then(
@@ -39,28 +43,30 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
                     vscode.window.showWarningMessage(
                         'Completion was interpreted due to rack of buffer size. ' +
                         'The buffer size can be increased using `clang.completion.maxBuffer`. '
-                    );                    
+                    );
                 }
                 return [];
             }
         );
     }
-    
+
     fetchCompletionItems(document: vscode.TextDocument, position: vscode.Position, token: vscode.CancellationToken): Thenable<string> {
-        // Currently, Clang does NOT complete token partially 
+        // Currently, Clang does NOT complete token partially
         // So we find a previous delimiter and start complete from there.
         let delPos = findPreviousDelimiter(document, position);
-        let [cmd, args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
-        return execution.processString(cmd, args, 
+        const [cmd, base_args] = clang.complete(document.languageId, delPos.line + 1, delPos.character + 1);
+        const info = this._compilationDatabase.infoForDocument(document.fileName);
+        const args = base_args.concat(info.args);
+        return execution.processString(cmd, args,
             {
-                cwd: path.dirname(document.uri.fsPath),
+                cwd: info.cwd || path.dirname(document.uri.fsPath),
                 maxBuffer: clang.getConf<number>('completion.maxBuffer')
             },
             token,
             document.getText()
-        ).then((result) => result.stdout.toString());      
+        ).then((result) => result.stdout.toString());
     }
-    
+
     parseCompletionItem(line: string): vscode.CompletionItem|void {
         let matched = line.match(completionRe);
         if (matched == null) return;
@@ -93,19 +99,19 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
         if (signature.indexOf('(') != -1) {
             item.kind = vscode.CompletionItemKind.Function;
         } else if (hasValue) {
-            item.kind = vscode.CompletionItemKind.Variable;            
+            item.kind = vscode.CompletionItemKind.Variable;
         } else {
             item.kind = vscode.CompletionItemKind.Class;
         }
         return item;
     }
-    
+
     parseCompletionItems(data: string): vscode.CompletionItem[] {
-        let result: vscode.CompletionItem[] = []; 
+        let result: vscode.CompletionItem[] = [];
         data.split(/\r\n|\r|\n/).forEach((line) => {
             let item = this.parseCompletionItem(line);
             if (item instanceof vscode.CompletionItem) {
-                result.push(item);            
+                result.push(item);
             }
         });
         return result;
