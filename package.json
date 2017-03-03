@@ -51,7 +51,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Compiler options for C (e.g. ['-std=c99'])"
+          "description": "Compiler options for C (e.g. [\"-std=c99\"])"
         },
         "clang.cxxflags": {
           "type": "array",
@@ -59,7 +59,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Compiler options for C++ (e.g. ['-std=c++11'])"
+          "description": "Compiler options for C++ (e.g. [\"-std=c++11\"])"
         },
         "clang.objcflags": {
           "type": "array",
