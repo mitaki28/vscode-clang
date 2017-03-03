@@ -1,7 +1,7 @@
 {
   "name": "vscode-clang",
-  "displayName": "C/C++ Clang",
-  "description": "Completion and Diagnostic for C/C++/Objective-C using Clang",
+  "displayName": "C/C++ Clang Command Adapter",
+  "description": "Completion and Diagnostic for C/C++/Objective-C using Clang Command",
   "version": "0.2.1",
   "publisher": "mitaki28",
   "license": "MIT",
@@ -33,12 +33,12 @@
       {
         "command": "clang.showExecConf",
         "title": "Show Executable and Compile Options",
-        "category": "Clang"
+        "category": "ClangCommandAdapter"
       }
     ],
     "configuration": {
       "type": "object",
-      "title": "Clang configulation",
+      "title": "Clang command adapter configulation",
       "properties": {
         "clang.executable": {
           "type": "string",

@@ -1,6 +1,13 @@
-# C/C++ Clang
+# C/C++ Clang Command Adapter
 
-Completion and Diagnostic for C/C++/Objective-C using [Clang](http://clang.llvm.org/)
+Completion and Diagnostic for C/C++/Objective-C using [Clang](http://clang.llvm.org/) command.
+
+## Important Notes
+
+Clang project officialy starts to implement [Language Server](https://github.com/Microsoft/language-server-protocol) named _clangd_.
+(https://github.com/llvm-mirror/clang-tools-extra/tree/master/clangd)
+
+This extension was renamed to C/C++ Clang Command Adapter to avoid confusion, because this extension is unofficial and only parse output of clang command.
 
 ## Requirements
 
