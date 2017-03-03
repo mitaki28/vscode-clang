@@ -1,6 +1,6 @@
 # C/C++ Clang Command Adapter
 
-Completion and Diagnostic for C/C++/Objective-C using [Clang](http://clang.llvm.org/) command.
+Completion and Diagnostic for C, C++, and Objective-C/C++ using [Clang](http://clang.llvm.org/) command.
 
 ## Important Notes
 
@@ -22,7 +22,7 @@ You can use configuration interface of Visual Studio Code. (Press `F1` and type 
 
 ### Common
 - `clang.executable`: Clang command or the path to the Clang executable (default: `clang`)
-- `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Compiler Options for C/C++/Objective-C
+- `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Compiler Options for C/C++/Objective-C and Objective-C++
 
 ### Completion
 

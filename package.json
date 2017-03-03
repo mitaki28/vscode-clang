@@ -1,7 +1,7 @@
 {
   "name": "vscode-clang",
   "displayName": "C/C++ Clang Command Adapter",
-  "description": "Completion and Diagnostic for C/C++/Objective-C using Clang Command",
+  "description": "Completion and Diagnostic for C, C++, and Objective-C/C++ using Clang Command",
   "version": "0.2.2",
   "publisher": "mitaki28",
   "license": "MIT",
@@ -25,6 +25,7 @@
     "onLanguage:cpp",
     "onLanguage:c",
     "onLanguage:objective-c",
+    "onLanguage:objective-cpp",
     "onCommand:clang.showExecConf"
   ],
   "main": "./out/src/extension",
@@ -67,7 +68,7 @@
             "type": "string"
           },
           "default": [],
-          "description": "Compiler options for Objective-C"
+          "description": "Compiler options for Objective-C/Objective-C++"
         },
         "clang.diagnostic.enable": {
           "type": "boolean",
