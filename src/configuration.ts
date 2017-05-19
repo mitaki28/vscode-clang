@@ -21,7 +21,7 @@ export class ConfigurationTester implements vscode.Disposable {
             }
             this.processes.delete(proc.pid);
         });
-        proc.stdin.end("int main() { return 0; }");
+        proc.stdin.end("int main() { return 0; }\n");
         this.processes.set(proc.pid, proc);
     }
     dispose() {
