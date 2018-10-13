@@ -7,7 +7,8 @@ import * as completion from "./completion";
 const CLANG_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },
     { language: "c", scheme: "file" },
-    { language: "objective-c", scheme: "file" }
+    { language: "objective-c", scheme: "file" },
+    { language: "objective-cpp", scheme: "file" }
 ];
 
 class ResidentExtension implements vscode.Disposable {
@@ -74,7 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerTextEditorCommand("clang.showExecConf",
         (editor: vscode.TextEditor, edit: vscode.TextEditorEdit) => {
             if (!vscode.languages.match(CLANG_MODE, editor.document)) {
-                vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C`);
+                vscode.window.showErrorMessage(`Current language is not C, C++ or Objective-C/C++`);
                 return;
             }
             confViewer.show(editor.document);

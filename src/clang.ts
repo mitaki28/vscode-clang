@@ -44,6 +44,9 @@ export function command(language: string, ...options: string[]): [string, string
     } else if (language === "objective-c") {
         args.push("-x", "objective-c");
         args.push(...getConf<string[]>("objcflags").map(variable.resolve));
+    }  else if (language === "objective-cpp") {
+        args.push("-x", "objective-c++");
+        args.push(...getConf<string[]>("objcflags").map(variable.resolve));
     }
     args.push(...options);
     return [cmd, args];
