@@ -40,6 +40,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
         const uri = change.document.uri;
         const uriStr = uri.toString();
         if (cancellers.has(uriStr)) {
+            cancellers.get(uriStr).cancel();
             cancellers.get(uriStr).dispose();
         }
         cancellers.set(uriStr, new vscode.CancellationTokenSource);
@@ -57,6 +58,7 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
         dispose() {
             collection.dispose();
             for (let canceller of Array.from(cancellers.values())) {
+                canceller.cancel();
                 canceller.dispose();
             }
             vscode.Disposable.from(...subsctiptions).dispose();
