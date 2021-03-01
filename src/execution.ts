@@ -37,7 +37,7 @@ export function processString(cmd: string, args: string[], opt: Option, token: v
                 }
             }
         );
-        proc.stdin.end(input);
+        proc.stdin!.end(input);
         token.onCancellationRequested(() => {
             process.nextTick(() => proc.kill());
             reject(<FailedExecution>{

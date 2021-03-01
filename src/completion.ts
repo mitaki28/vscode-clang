@@ -22,7 +22,9 @@ function findPreviousDelimiter(document: vscode.TextDocument, position: vscode.P
     let line = position.line;
     let char = position.character;
     const s = document.getText(new vscode.Range(line, 0, line, char));
-    while (char > 0 && !isDelimiter(s[char - 1])) char--;
+    while (char > 0 && !isDelimiter(s[char - 1])) {
+        char--;
+    }
     return new vscode.Position(line, char);
 }
 
@@ -63,7 +65,9 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
 
     parseCompletionItem(line: string): vscode.CompletionItem | void {
         let matched = line.match(completionRe);
-        if (matched == null) return;
+        if (matched == null) {
+            return;
+        }
         let [_line, symbol, description] = matched;
         let item = new vscode.CompletionItem(symbol);
         if (description == null) {
@@ -71,7 +75,11 @@ export class ClangCompletionItemProvider implements vscode.CompletionItemProvide
             item.kind = vscode.CompletionItemKind.Class;
             return item;
         }
-        let [_description, signature, comment] = description.match(descriptionRe);
+        const match = description.match(descriptionRe);
+        if (match == null) {
+            return;
+        }
+        let [_description, signature, comment] = match;
         if (comment != null) {
             item.documentation = comment;
         }

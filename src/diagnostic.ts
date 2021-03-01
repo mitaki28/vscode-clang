@@ -36,21 +36,25 @@ export function registerDiagnosticProvider(selector: vscode.DocumentSelector, pr
     let cancellers = new Map<string, vscode.CancellationTokenSource>();
     let subsctiptions: vscode.Disposable[] = [];
     vscode.workspace.onDidChangeTextDocument((change) => {
-        if (!vscode.languages.match(selector, change.document)) return;
+        if (!vscode.languages.match(selector, change.document)) {
+            return;
+        }
         const uri = change.document.uri;
         const uriStr = uri.toString();
         if (cancellers.has(uriStr)) {
-            cancellers.get(uriStr).cancel();
-            cancellers.get(uriStr).dispose();
+            cancellers.get(uriStr)!.cancel();
+            cancellers.get(uriStr)!.dispose();
         }
         cancellers.set(uriStr, new vscode.CancellationTokenSource);
-        delay(cancellers.get(uriStr).token).then(() => {
-            cancellers.get(uriStr).dispose();
+        delay(cancellers.get(uriStr)!.token).then(() => {
+            cancellers.get(uriStr)!.dispose();
             cancellers.set(uriStr, new vscode.CancellationTokenSource);
-            return provider.provideDiagnostic(change.document, cancellers.get(uriStr).token);
+            return provider.provideDiagnostic(change.document, cancellers.get(uriStr)!.token);
         }).then((diagnostics) => {
-            cancellers.get(uriStr).dispose();
-            cancellers.delete(uriStr);
+            if (cancellers.has(uriStr)) {
+                cancellers.get(uriStr)!.dispose();
+                cancellers.delete(uriStr);    
+            }
             collection.set(uri, diagnostics);
         }, (_) => { /* do nothing */ });
     }, null, subsctiptions);
@@ -127,7 +131,9 @@ export class ClangDiagnosticProvider implements DiagnosticProvider {
         let result: vscode.Diagnostic[] = [];
         data.split(/\r\n|\r|\n/).forEach((line) => {
             let matched = line.match(diagnosticRe);
-            if (!matched) return;
+            if (!matched) {
+                return;
+            }
             let range: vscode.Range;
             if (matched[3] == null) {
                 let line = parseInt(matched[1], 10);

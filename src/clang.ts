@@ -1,6 +1,3 @@
-import * as path from "path";
-import * as child_process from "child_process";
-
 import * as vscode from "vscode";
 
 import * as variable from "./variable";
@@ -16,7 +13,7 @@ const deprecatedMap: Map<string, string> = new Map<string, string>(
 export function getConf<T>(name: string): T {
     let conf = vscode.workspace.getConfiguration("clang");
     if (deprecatedMap.has(name)) {
-        let depName = deprecatedMap.get(name);
+        let depName = deprecatedMap.get(name)!;
         let value = conf.get<T>(depName);
         if (value != null) {
             vscode.window.showWarningMessage(
@@ -28,6 +25,7 @@ export function getConf<T>(name: string): T {
     let value = conf.get<T>(name);
     if (value == null) {
         vscode.window.showErrorMessage(`Error: invalid configuration ${name}`);
+        throw new Error(`invalid configuration ${name}`);
     }
     return value;
 }
