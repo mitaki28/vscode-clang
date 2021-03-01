@@ -18,7 +18,7 @@ class ResidentExtension implements vscode.Disposable {
     }
     private _updateProvider(enable: boolean, name: string, create: () => vscode.Disposable): void {
         if (this.extensions.has(name)) {
-            this.extensions.get(name).dispose();
+            this.extensions.get(name)!.dispose();
             this.extensions.delete(name);
         }
         if (enable) {
@@ -84,7 +84,9 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(confTester);
     let subscriptions: vscode.Disposable[] = [];
     vscode.window.onDidChangeActiveTextEditor((editor) => {
-        if (!editor || !vscode.languages.match(CLANG_MODE, editor.document)) return;
+        if (!editor || !vscode.languages.match(CLANG_MODE, editor.document)) {
+            return;
+        }
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
 

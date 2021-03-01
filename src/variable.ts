@@ -1,4 +1,3 @@
-import * as path from "path";
 import * as vscode from "vscode";
 
 export function resolve(s: string): string {
@@ -17,7 +16,7 @@ export function resolve(s: string): string {
             }
         }
         if ($1.startsWith("env.")) {
-            return process.env[$1.slice("env.".length)];
+            return process.env[$1.slice("env.".length)] ?? '';
         }
         vscode.window.showWarningMessage(`configuration variable ${match} is not supported.`);
         return match;
