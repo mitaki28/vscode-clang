@@ -2,7 +2,7 @@
   "name": "vscode-clang",
   "displayName": "C/C++ Clang Command Adapter",
   "description": "Completion and Diagnostic for C/C++/Objective-C using Clang Command",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "publisher": "mitaki28",
   "license": "MIT",
   "repository": {
@@ -33,6 +33,21 @@
       {
         "command": "clang.showExecConf",
         "title": "Show Executable and Compile Options",
+        "category": "ClangCommandAdapter"
+      },
+      {
+        "command": "clang.trustWorkspace",
+        "title": "Trust Workspace",
+        "category": "ClangCommandAdapter"
+      },
+      {
+        "command": "clang.untrustWorkspace",
+        "title": "Untrust Workspace",
+        "category": "ClangCommandAdapter"
+      },
+      {
+        "command": "clang.resetWorkspaceState",
+        "title": "Reset All State",
         "category": "ClangCommandAdapter"
       }
     ],

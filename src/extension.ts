@@ -3,6 +3,7 @@ import * as clang from "./clang";
 import * as configuration from "./configuration";
 import * as diagnostic from "./diagnostic";
 import * as completion from "./completion";
+import * as state from "./state";
 
 const CLANG_MODE: vscode.DocumentSelector = [
     { language: "cpp", scheme: "file" },
@@ -68,6 +69,26 @@ class ResidentExtension implements vscode.Disposable {
 }
 
 export function activate(context: vscode.ExtensionContext) {
+    state.initWorkspaceState(context.workspaceState);
+    context.subscriptions.push(vscode.commands.registerCommand(
+        "clang.trustWorkspace",
+        () => {
+            state.getWorkspaceState().updateWorkspaceIsTrusted(true);
+        }
+    ));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        "clang.untrustWorkspace",
+        () => {
+            state.getWorkspaceState().updateWorkspaceIsTrusted(false);
+        }
+    ));
+    context.subscriptions.push(vscode.commands.registerCommand(
+        "clang.resetWorkspaceState",
+        () => {
+            state.getWorkspaceState().reset();
+        }
+    ));
+    clang.checkInsecureKeys();
 
     let confViewer = new configuration.ConfigurationViewer;
     context.subscriptions.push(confViewer);
@@ -87,6 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (!editor || !vscode.languages.match(CLANG_MODE, editor.document)) {
             return;
         }
+        clang.checkInsecureKeys();
         confTester.test(editor.document.languageId);
     }, null, subscriptions);
 
@@ -94,6 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
     let residentExtension: ResidentExtension = new ResidentExtension();
     context.subscriptions.push(residentExtension);
     vscode.workspace.onDidChangeConfiguration(() => {
+        clang.checkInsecureKeys();
         residentExtension.update();
     }, null, subscriptions);
     context.subscriptions.push(vscode.Disposable.from(...subscriptions));
