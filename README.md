@@ -56,7 +56,20 @@ Please update as follows:
 
 ## Command
 
-- `Show Executable and Compile Options`: Showing Clang executable and compile options for the active editor.
+- `ClangCommandAdapter: Show Executable and Compile Options`: Showing Clang executable and compile options for the active editor.
+- `ClangCommandAdapter: Trust Workspace`: Trust the current workspace. (see [#Security](#Security))
+- `ClangCommandAdapter: Untrust Workspace`: Untrust the current workspace. (see [#Security](#Security))
+
+## Security
+
+The following settings may cause security issue, if you are opening a malicious workspece.
+
+- `clang.executable`: Arbitrary executables specified in the workspace-level setting will be executed.
+- `clang.cflags`, `clang.cxxflags`, `clang.objcflags`: Clang command is executed with artibrary options specified in the workspace-level setting.
+
+Therefore, these workspace-level settings are disabled by default.
+- To enable these workspace-level settings, please trust the workspace from dialog that appears when you open the file.
+- To change trust/untrust status of the current workspace, please use `ClangCommandAdapter: Trust Workspace` or `ClangCommandAdapter: Untrust Workspace`.
 
 ## Acknowledgements
 
