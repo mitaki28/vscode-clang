@@ -6,15 +6,15 @@ import * as state from "./state";
 const renamedKeyMap: Map<string, string> = new Map<string, string>(
     new Array<[string, string]>(
         ["diagnostic.delay", "diagnosticDelay"],
-        ["diagnostic.enable", "" + "enableDiagnostic"],
-        ["completion.enable", `enableCompletion`]
+        ["diagnostic.enable", "enableDiagnostic"],
+        ["completion.enable", "enableCompletion"]
     )
 );
 
 const insecureKeys: Set<string> = new Set<string>([
     'executable',
-    `cflags`,
-    `cflags`,
+    'cflags',
+    'cxxflags',
     'objcflags',
 ]);
 
@@ -28,30 +28,35 @@ export function checkInsecureKeys(): Thenable<void> {
             customInsecureSettings.push(key);
         }
     }
-
-    return customInsecureSettings.length > 0 ? vscode.window.showWarningMessage(
-        `Some of workspace-level setting (${customInsecureSettings.map((s) => "`clang." + s + "`").join(", ")}) is disabled by default. These settings may cause security issue, if you are opening a malicious workspace.Do you trust the current workspace and enable these settings?`,
-        {modal: false},
-        {title: "Yes"}, {title: "No"}, {title: "More Info"},
-    ).then((answer: { title: any; }) => {
-        switch (answer?.title) {
-            case "Yes": {
-                state.getWorkspaceState().updateWorkspaceIsTrusted(true);
-                break;
+    if (customInsecureSettings.length > 0) {
+        return vscode.window.showWarningMessage(
+            "Some of workspace-level setting (" + customInsecureSettings.map((s) => "`clang." + s + "`").join(", ") + ") is disabled by default. "
+            + "These settings may cause security issue, if you are opening a malicious workspece. "
+            + "Do you trust the current workspace and enable these settings? ",
+            {modal: false},
+            {title: "Yes"}, {title: "No"}, {title: "More Info"},
+        ).then((answer) => {
+            switch (answer?.title) {
+                case "Yes": {
+                    state.getWorkspaceState().updateWorkspaceIsTrusted(true);
+                    break;
+                }
+                case "No": {
+                    state.getWorkspaceState().updateWorkspaceIsTrusted(false);
+                    break;
+                }
+                case "More Info":
+                    vscode.env.openExternal(
+                        vscode.Uri.parse(`https://github.com/mitaki28/vscode-clang/blob/master/README.md#Security`)
+                    );
+                    return checkInsecureKeys();
+                default:
+                    // do nothing (keep unanswerd state)
             }
-            case "No": {
-                state.getWorkspaceState().updateWorkspaceIsTrusted(false);
-                break;
-            }
-            case "More Info":
-                vscode.env.openExternal(
-                    vscode.Uri.parse(`https://github.com/mitaki28/vscode-clang/blob/master/README.md#Security`)
-                );
-                return checkInsecureKeys();
-            default:
-                // do nothing (keep unanswerd state)
-        }
-    }) : Promise.resolve();
+        });
+    } else {
+        return Promise.resolve();
+    }
 }
 
 export function getConf<T>(name: string): T {
@@ -94,10 +99,9 @@ export function command(language: string, ...options: string[]): [string, string
 }
 
 export function complete(language: string, line: number, char: number): [string, string[]] {
-    let args;
-    args = [];
-    args.push('-fsyntax-only');
-    args.push('-fparse-all-comments');
+    let args = [];
+    args.push("-fsyntax-only");
+    args.push("-fparse-all-comments");
     if (getConf<boolean>("completion.completeMacros")) {
         args.push("-Xclang", "-code-completion-macros");
     }
