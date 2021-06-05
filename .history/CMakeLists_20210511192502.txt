@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.0.0)
+CMake(project) (Clang) (VERSION 3.0.1)
+configure_file(target_compile_definitions)
+include(CTest)
+enable_testing()
+ add_Clang.executable(Clang main.cpp)
+ add_CMAKE_C_COMPiler
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
